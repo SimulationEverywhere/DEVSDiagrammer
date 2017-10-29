@@ -206,4 +206,49 @@ void submodels_to_json(ptree &json_model) {
     json_model.add_child("models", json_submodels_list);
 };
 
+/*******************************************************/
+/******* submodels with depth export to json ***********/
+/*******************************************************/
+
+template<typename TIME,  template<typename> class SUBMODELS, template<template<typename MT> typename M> typename COUPLED_JSON_EXPORTER, template<template<typename MT> typename M> typename ATOMIC_JSON_EXPORTER, std::size_t S>
+struct submodels_to_json_depth_impl {
+
+    template <typename T>
+    using current_submodel=typename std::tuple_element<S - 1, SUBMODELS<T>>::type;
+    using recursive_json_exporter=typename std::conditional<cadmium::concept::is_atomic<current_submodel>::value(), ATOMIC_JSON_EXPORTER<current_submodel>, COUPLED_JSON_EXPORTER<current_submodel>>::type;
+    using nonrecursive_json_exporter=ATOMIC_JSON_EXPORTER<current_submodel>;
+    static void print(ptree& json_submodels_list, int depth) {
+
+        ptree current_json_submodel;
+
+        if (depth == 0) {
+
+            nonrecursive_json_exporter atomic_exporter;
+            atomic_exporter.export_to_json(current_json_submodel);
+
+        } else {
+
+            recursive_json_exporter recursive_exporter;
+            recursive_exporter.export_to_json(current_json_submodel, depth - 1);
+
+        }
+
+        json_submodels_list.push_back(std::make_pair("", current_json_submodel));
+        submodels_to_json_depth_impl<TIME, SUBMODELS, COUPLED_JSON_EXPORTER, ATOMIC_JSON_EXPORTER, S - 1>::print(json_submodels_list, depth);
+    }
+};
+
+template<typename TIME,  template<typename> typename SUBMODELS, template<template<typename MT> typename M> typename COUPLED_JSON_EXPORTER, template<template<typename MT> typename M> typename ATOMIC_JSON_EXPORTER>
+struct submodels_to_json_depth_impl<TIME, SUBMODELS, COUPLED_JSON_EXPORTER, ATOMIC_JSON_EXPORTER, 0> {
+    static void print(ptree& json_submodels_list, int depth) { /* do nothing, this is the base case */ }
+};
+
+template<typename TIME,  template<typename> typename SUBMODELS, template<template<typename MT> typename M> typename COUPLED_JSON_EXPORTER, template<template<typename MT> typename M> typename ATOMIC_JSON_EXPORTER>
+void submodels_to_json(ptree &json_model, int depth) {
+
+    ptree json_submodels_list;
+    submodels_to_json_depth_impl<TIME, SUBMODELS, COUPLED_JSON_EXPORTER, ATOMIC_JSON_EXPORTER, std::tuple_size<SUBMODELS<TIME>>::value>::print(json_submodels_list, depth);
+    json_model.add_child("models", json_submodels_list);
+};
+
 #endif //PMGBP_PDEVS_TUPLE_PRINTER_HPP_HPP
