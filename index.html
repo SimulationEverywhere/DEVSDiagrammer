@@ -9,15 +9,24 @@
 
     <script src="vendors/js/createjs/createjs-2013.12.12.min.js"></script>
     <script src="vendors/js/jquery-3.2.1/jquery-3.2.1.min.js"></script>
-    <script src="js/line.js"></script>
-    <script src="js/coupled.js"></script>
+    <script src="js/toposort.js"></script>
+    <script src="js/Square.js"></script>
+    <script src="js/Port.js"></script>
+    <script src="js/Line.js"></script>
+    <script src="js/Coupled.js"></script>
+    <script src="js/Canvas.js"></script>
     <script src="js/main.js"></script>
 
     <script>
-      $(document).ready(main);
+      $(document).ready(function() {
+        $("#model_structure").show();
+        $("#generate").show();
+      });
     </script>
   </head>
   <body>
-    <canvas id="stageCanvas" width="916" height="512"></canvas>
+    <textarea id="model_structure" rows="6" cols="50" style="display: none"></textarea>
+    <button id="generate" type="button" onclick="main();" style="display: none">Generate model</button>
+    <canvas id="stageCanvas" width="1200" height="916"></canvas>
   </body>
 </html>

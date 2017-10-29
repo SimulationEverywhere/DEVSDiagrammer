@@ -1,4 +1,4 @@
-/*global createjs, $, canvas */
+/*global createjs, $ */
 /*exported Line*/
 "use strict";
 
@@ -30,5 +30,5 @@ Line.prototype.draw_line = function() {
     for (i = 1; i < this.nodes.length; ++i) {
         this.graphics.lineTo(this.nodes[i].x, this.nodes[i].y);
     }
-    canvas.stage.update();
+    this.canvas.stage.update();
 };

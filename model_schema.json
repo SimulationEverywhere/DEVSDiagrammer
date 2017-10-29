@@ -1,0 +1,80 @@
+{
+	"id": "top",
+	"type": "coupled",
+	"models": [
+		{
+			"id": "a",
+			"type": "coupled",
+			"models": [
+				{
+					"id": "a",
+					"type": "atomic",
+					"ports": {
+						"in": ["in_0"],
+						"out": ["out_0"]
+					}
+				},
+				{
+					"id": "b",
+					"type": "atomic",
+					"ports": {
+						"in": ["in_0", "in_1"],
+						"out": ["out_0"]
+					}
+				}
+			],
+			"ic": [
+				{
+					"from_model": "a",
+					"to_model": "b",
+					"from_port": "out_0",
+					"to_port": "in_0"
+				}
+			],
+			"ports": {
+				"in": ["in_0"],
+				"out": ["out_0"]
+			},
+			"eoc": [{
+				"external_out_port":"out_0",
+				"out_port":"out_0",
+				"from":"b"
+			}],
+			"eic": [{
+				"external_in_port":"in_0",
+				"in_port":"in_0",
+				"to":"a"
+			}]
+		},
+		{
+			"id": "b",
+			"type": "atomic",
+			"ports": {
+				"in": ["in_0", "in_1"],
+				"out": ["out_0"]
+			}
+		}
+	],
+	"ic": [
+		{
+			"from_model": "a",
+			"to_model": "b",
+			"from_port": "out_0",
+			"to_port": "in_0"
+		}
+	],
+	"ports": {
+		"in": ["in_0"],
+		"out": ["out_0"]
+	},
+	"eoc": [{
+		"external_out_port":"out_0",
+		"out_port":"out_0",
+		"from":"b"
+	}],
+	"eic": [{
+		"external_in_port":"in_0",
+		"in_port":"in_0",
+		"to":"a"
+	}]
+}
