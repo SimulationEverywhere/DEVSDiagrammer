@@ -30,7 +30,6 @@ function new_model(structure) {
 	canvas.push(new Canvas({ structure: structure }));
 }
 
-
 function new_input_model() {
     canvas.push(new Canvas({
         structure_input_id: "#model_structure",

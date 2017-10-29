@@ -112,7 +112,7 @@ Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outi
         port = new Port({
             canvas: this.canvas,
             outin: outin,
-            fillColor: "#0000",
+            fillColor: "#FFFFFF",
             width: width,
             height: height,
             id: structure_ports[i].name,
@@ -260,7 +260,7 @@ Coupled.prototype.draw_eoc = function() {
 
 Coupled.prototype.connect = function(port_out, port_in) {
     var start_point, end_point, line;
-    start_point = port_out.parent.localToLocal( port_out.x - port_out.regX,
+    start_point = port_out.parent.localToLocal( port_out.x + port_out.width - port_out.regX,
                                                 port_out.y - port_out.regY + port_out.height / 2,
                                                 this);
     end_point = port_in.parent.localToLocal(port_in.x - port_in.regX,
