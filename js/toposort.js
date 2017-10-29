@@ -57,7 +57,7 @@ function separate_in_columns(sorted_graph) {
 		
 		node = sorted_graph[i];
 		if(neighbors.indexOf(node.model) === -1) { // if is no neighbor it can be placed in the same column
-			neighbors.concat(node.neighbors);
+			neighbors = neighbors.concat(node.neighbors);
 			res[res.length - 1].push(node.model);
 		} else { // if is a neighbor, a new column must start
 			res.push([node.model]);
