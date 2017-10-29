@@ -1,4 +1,4 @@
-/*global createjs, $, Square, Port, Line, relaxed_khan */
+/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_structures */
 /*exported Coupled */
 
 "use strict";
@@ -27,6 +27,9 @@ Coupled.prototype.initialize = function(parameters) {
     this.eoc = [];
     this.eic = [];
 
+    /************ status values *************/
+    this.selected = false;
+
     /********** Default values **************/
     this.textColor = "#000000";
     this.radius_percentage = 0.05;
@@ -34,8 +37,8 @@ Coupled.prototype.initialize = function(parameters) {
     $.extend(true, this, parameters);
 
     if (this.is_top) {
-        this.width = this.canvas.stageWidth * 0.9;
-        this.height = this.canvas.stageHeight * 0.9;
+        this.width = this.canvas.stageWidth * 0.85;
+        this.height = this.canvas.stageHeight * 0.85;
         this.x = (this.canvas.stageWidth - this.width) / 2;
         this.y = (this.canvas.stageHeight - this.height) / 2;
     }
@@ -43,10 +46,11 @@ Coupled.prototype.initialize = function(parameters) {
     this.draw_coupled();
 
     this.addEventListener("dblclick", this.toggle.bind(this));
+    this.addEventListener("pressup", this.select.bind(this));
 };
 
 Coupled.empty_structure = {
-    type: "",
+    type: "atomic", // by default asumes it's an empty atomic model
     models: [],
     ic: [],
     ports: {in: [], out: []},
@@ -99,7 +103,7 @@ Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outi
     this.clean(graphical_ports);
 
     height = (this.height * 0.9 / structure_ports.length) - 1;
-    height = Math.min(height, Math.floor(this.height * 0.1));
+    height = Math.min(height, Math.floor(this.height * 0.06));
     width = height;
 
     margin = (this.height * 0.9 / structure_ports.length) - height;
@@ -111,7 +115,8 @@ Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outi
             fillColor: "#0000",
             width: width,
             height: height,
-            id: structure_ports[i],
+            id: structure_ports[i].name,
+            message_type: structure_ports[i].message_type,
             font_size: height * 0.4
         });
 
@@ -150,7 +155,9 @@ Coupled.prototype.clean = function(models) {
 
 Coupled.prototype.expand = function() {
 
-    if (this.structure.models.length === 0 || this.is_expanded) { return; }
+    if (this.structure.type === "atomic" ||
+        this.structure.models.length === 0 ||
+        this.is_expanded) { return; }
 
     var modelsByColumns, highestColum, modelsWidth, modelsHeight, i, j, x;
     var model, columnMoldes, modelStructure;
@@ -226,8 +233,8 @@ Coupled.prototype.draw_eic = function() {
     for (i = 0; i < this.structure.eic.length; i++) {
         eic = this.structure.eic[i];
 
-        port_out = this.getPort(this.id, eic.external_in_port, Port.in);
-        port_in = this.getPort(eic.to, eic.in_port, Port.in);
+        port_out = this.getPort(this.id, eic.from_port, Port.in);
+        port_in = this.getPort(eic.to_model, eic.to_port, Port.in);
         
         this.eic.push(this.connect(port_out, port_in));
     }
@@ -242,8 +249,8 @@ Coupled.prototype.draw_eoc = function() {
     for (i = 0; i < this.structure.eoc.length; i++) {
         eoc = this.structure.eoc[i];
 
-        port_out = this.getPort(eoc.from, eoc.out_port, Port.out);
-        port_in = this.getPort(this.id, eoc.external_out_port, Port.out);
+        port_out = this.getPort(eoc.from_model, eoc.from_port, Port.out);
+        port_in = this.getPort(this.id, eoc.to_port, Port.out);
         
         this.eoc.push(this.connect(port_out, port_in));
     }
@@ -322,7 +329,7 @@ Coupled.prototype.contract = function() {
 };
 
 Coupled.prototype.toggle = function(evt) {
-    console.log("ID: ", this.id);
+    console.log("ID:", this.id, "Toggle");
     evt.stopImmediatePropagation();
 
     if (this.is_expanded) {
@@ -334,8 +341,36 @@ Coupled.prototype.toggle = function(evt) {
     return false;
 };
 
-Coupled.prototype.expandInNewCanvas = function() {};
+Coupled.prototype.select = function(evt) {
+    console.log("ID:", this.id, "Select");
+    evt.stopImmediatePropagation();
 
-Coupled.prototype.destroy = function() {
-    if (!this.is_top) { return; }
+    this.is_selected = !this.is_selected;
+
+    if (this.is_selected) {
+        selected_structures.push(this.structure);
+
+        if (this.is_top) {
+            selected_for_removal.push({id: this.structure.id, canvas: this.canvas});            
+        }
+
+    } else {
+        var i = 0;
+        while (i < selected_structures.length) {
+            if (selected_structures[i].id === this.structure.id) {
+                selected_structures.splice(i,1);
+            } else {
+                i++;
+            }
+        }
+
+        var i = 0;
+        while (i < selected_for_removal.length) {
+            if (selected_for_removal[i].id === this.structure.id) {
+                selected_for_removal.splice(i,1);
+            } else {
+                i++;
+            }
+        }
+    }
 };

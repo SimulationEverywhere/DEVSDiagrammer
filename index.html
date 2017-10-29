@@ -9,13 +9,13 @@
 
     <script src="vendors/js/createjs/createjs-2013.12.12.min.js"></script>
     <script src="vendors/js/jquery-3.2.1/jquery-3.2.1.min.js"></script>
+    <script src="js/main.js"></script>
     <script src="js/toposort.js"></script>
     <script src="js/Square.js"></script>
     <script src="js/Port.js"></script>
     <script src="js/Line.js"></script>
     <script src="js/Coupled.js"></script>
     <script src="js/Canvas.js"></script>
-    <script src="js/main.js"></script>
 
     <script>
       $(document).ready(function() {
@@ -25,8 +25,15 @@
     </script>
   </head>
   <body>
-    <textarea id="model_structure" rows="6" cols="50" style="display: none"></textarea>
-    <button id="generate" type="button" onclick="main();" style="display: none">Generate model</button>
-    <canvas id="stageCanvas" width="1200" height="916"></canvas>
+  <div id="input_wrapper">
+    <label for="model_structure"><bold>Insert the json DEVS model (JSON data)<bold></label>
+    <textarea id="model_structure" style="display: none"></textarea>
+  </div>
+  <div>
+    <button id="generate" type="button" onclick="new_input_model();" style="display: none">Generate model</button>
+  </div>
+  <!--
+  <canvas id="stageCanvas" width="1200" height="916"></canvas>
+  -->
   </body>
 </html>

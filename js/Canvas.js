@@ -1,4 +1,4 @@
-/*global $, createjs, Coupled */
+/*global $, createjs, Coupled, canvas */
 /*export Canvas */
 "use strict";
 function Canvas(parameters) {
@@ -6,7 +6,8 @@ function Canvas(parameters) {
 }
 
 Canvas.prototype.initialize = function(parameters) {
-	this.dom_canvas = $(parameters.canvasId);
+    this.dom_canvas = $('<canvas/>',{'Width':1500,'Height':1500, 'id': "stage_canvas_" + canvas.length.toString() });
+    $('body').append(this.dom_canvas);
 
     this.stage = new createjs.Stage(this.dom_canvas.get(0));
     this.subStage = new createjs.Container();
@@ -15,7 +16,11 @@ Canvas.prototype.initialize = function(parameters) {
     this.stageWidth  = this.dom_canvas.width();
     this.stageHeight = this.dom_canvas.height();
 
-    var structure = JSON.parse($(parameters.structure_input_id).val());
+    var structure = parameters.structure;
+    if (structure === undefined || structure === null) {
+        structure = JSON.parse($(parameters.structure_input_id).val());
+    }
+    
     this.top_model = new Coupled({
     	is_top: true,
     	canvas: this,

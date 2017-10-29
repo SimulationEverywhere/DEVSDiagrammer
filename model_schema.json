@@ -10,16 +10,16 @@
 					"id": "a",
 					"type": "atomic",
 					"ports": {
-						"in": ["in_0"],
-						"out": ["out_0"]
+						"in": [{"name": "in_0", "message_type": "int"}],
+						"out": [{"name":"out_0", "message_type": "int"}]
 					}
 				},
 				{
 					"id": "b",
 					"type": "atomic",
 					"ports": {
-						"in": ["in_0", "in_1"],
-						"out": ["out_0"]
+						"in": [{"name":"in_0", "message_type":"int"}, {"name":"in_1", "message_type":"int"}],
+						"out": [{"name":"out_0", "message_type":"int"}]
 					}
 				}
 			],
@@ -32,26 +32,26 @@
 				}
 			],
 			"ports": {
-				"in": ["in_0"],
-				"out": ["out_0"]
+				"in": [{"name":"in_0", "message_type":"int"}],
+				"out": [{"name":"out_0", "message_type":"int"}]
 			},
 			"eoc": [{
-				"external_out_port":"out_0",
-				"out_port":"out_0",
-				"from":"b"
+				"to_port":"out_0",
+				"from_port":"out_0",
+				"from_model":"b"
 			}],
 			"eic": [{
-				"external_in_port":"in_0",
-				"in_port":"in_0",
-				"to":"a"
+				"from_port":"in_0",
+				"to_port":"in_0",
+				"to_model":"a"
 			}]
 		},
 		{
 			"id": "b",
 			"type": "atomic",
 			"ports": {
-				"in": ["in_0", "in_1"],
-				"out": ["out_0"]
+				"in": [{"name":"in_0", "message_type":"int"}, {"name":"in_1", "message_type":"int"}],
+				"out": [{"name":"out_0", "message_type":"int"}]
 			}
 		}
 	],
@@ -64,17 +64,17 @@
 		}
 	],
 	"ports": {
-		"in": ["in_0"],
-		"out": ["out_0"]
+		"in": [{"name":"in_0", "message_type":"int"}],
+		"out": [{"name":"out_0", "message_type":"int"}]
 	},
 	"eoc": [{
-		"external_out_port":"out_0",
-		"out_port":"out_0",
-		"from":"b"
+		"to_port":"out_0",
+		"from_port":"out_0",
+		"from_model":"b"
 	}],
 	"eic": [{
-		"external_in_port":"in_0",
-		"in_port":"in_0",
-		"to":"a"
+		"from_port":"in_0",
+		"to_port":"in_0",
+		"to_model":"a"
 	}]
 }
