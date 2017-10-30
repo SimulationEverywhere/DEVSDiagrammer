@@ -93,8 +93,10 @@ Coupled.prototype.draw_name = function() {
     var bounds = this.name.getBounds();
     this.name.regX = bounds.width / 2;
 
-    this.name.scaleX = (this.width * 0.1) / bounds.width;
-    this.name.scaleY = this.name.scaleX;
+    this.name.scaleX = (this.width * 0.7) / bounds.width;
+    this.name.scaleY = (this.height * 0.1) / bounds.height;
+
+    this.name.scaleX = this.name.scaleY = Math.min(this.name.scaleX, this.name.scaleY);
 
     this.addChild(this.name);
 
