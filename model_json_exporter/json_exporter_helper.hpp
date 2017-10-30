@@ -47,7 +47,9 @@ void IC_to_json(ptree &json_model) {
     ptree json_IC_list;
     IC_to_json_impl<TIME, ICs, std::tuple_size<ICs>::value>::print(json_IC_list);
 
-    json_model.add_child("ic", json_IC_list);
+    if (!json_IC_list.empty()) {
+        json_model.add_child("ic", json_IC_list);
+    }
 };
 
 /*******************************************************/
@@ -84,7 +86,9 @@ void EIC_to_json(ptree &json_model) {
     ptree json_EIC_list;
     EIC_to_json_impl<TIME, EICs, std::tuple_size<EICs>::value>::print(json_EIC_list);
 
-    json_model.add_child("eic", json_EIC_list);
+    if (!json_EIC_list.empty()) {
+        json_model.add_child("eic", json_EIC_list);
+    }
 };
 
 /*******************************************************/
@@ -122,7 +126,9 @@ void EOC_to_json(ptree &json_model) {
     ptree json_EOC_list;
     EOC_to_json_impl<TIME, EOCs, std::tuple_size<EOCs>::value>::print(json_EOC_list);
 
-    json_model.add_child("eoc", json_EOC_list);
+    if (!json_EOC_list.empty()) {
+        json_model.add_child("eoc", json_EOC_list);
+    }
 };
 
 /*******************************************************/
@@ -163,10 +169,12 @@ void ports_to_json(ptree &json_model, cadmium::port_kind outin) {
     ptree json_ports_list;
     ports_to_json_impl<TIME, PORTS, std::tuple_size<PORTS>::value>::print(json_ports_list);
 
-    if (outin == cadmium::port_kind::out) {
-        json_model.add_child("out", json_ports_list);
-    } else {
-        json_model.add_child("in", json_ports_list);
+    if (!json_ports_list.empty()) {
+        if (outin == cadmium::port_kind::out) {
+            json_model.add_child("out", json_ports_list);
+        } else {
+            json_model.add_child("in", json_ports_list);
+        }
     }
 };
 
@@ -203,7 +211,10 @@ void submodels_to_json(ptree &json_model) {
 
     ptree json_submodels_list;
     submodels_to_json_impl<TIME, SUBMODELS, COUPLED_JSON_EXPORTER, ATOMIC_JSON_EXPORTER, std::tuple_size<SUBMODELS<TIME>>::value>::print(json_submodels_list);
-    json_model.add_child("models", json_submodels_list);
+
+    if (!json_submodels_list.empty()) {
+        json_model.add_child("models", json_submodels_list);
+    }
 };
 
 /*******************************************************/
@@ -248,7 +259,10 @@ void submodels_to_json(ptree &json_model, int depth) {
 
     ptree json_submodels_list;
     submodels_to_json_depth_impl<TIME, SUBMODELS, COUPLED_JSON_EXPORTER, ATOMIC_JSON_EXPORTER, std::tuple_size<SUBMODELS<TIME>>::value>::print(json_submodels_list, depth);
-    json_model.add_child("models", json_submodels_list);
+
+    if (!json_submodels_list.empty()) {
+        json_model.add_child("models", json_submodels_list);
+    }
 };
 
 #endif //PMGBP_PDEVS_TUPLE_PRINTER_HPP_HPP

@@ -35,7 +35,9 @@ public:
         ports_to_json<TIME, output_ports>(json_ports_model, cadmium::port_kind::out);
         ports_to_json<TIME, input_ports>(json_ports_model, cadmium::port_kind::in);
 
-        json_model.add_child("ports", json_ports_model);
+        if (!json_ports_model.empty()) {
+            json_model.add_child("ports", json_ports_model);
+        }
     }
 
     // just to allow the method call with the depth without asking if is an atomic exporter
@@ -96,7 +98,9 @@ public:
         ports_to_json<TIME, output_ports>(json_ports_model, cadmium::port_kind::out);
         ports_to_json<TIME, input_ports>(json_ports_model, cadmium::port_kind::in);
 
-        json_model.add_child("ports", json_ports_model);
+        if (!json_ports_model.empty()) {
+            json_model.add_child("ports", json_ports_model);
+        }
 
         submodels_to_json<TIME, submodels_type, coupled_submodel_exporter, atomic_submodel_exporter>(json_model);
     }
@@ -114,7 +118,9 @@ public:
         ports_to_json<TIME, output_ports>(json_ports_model, cadmium::port_kind::out);
         ports_to_json<TIME, input_ports>(json_ports_model, cadmium::port_kind::in);
 
-        json_model.add_child("ports", json_ports_model);
+        if (!json_ports_model.empty()) {
+            json_model.add_child("ports", json_ports_model);
+        }
 
         submodels_to_json<TIME, submodels_type, coupled_submodel_exporter, atomic_submodel_exporter>(json_model, depth);
     }
