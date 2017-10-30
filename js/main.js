@@ -12,34 +12,31 @@ var options = {
 	show_message_type : false, 
 };
 
-var event = {
+var evt = {
 	stopImmediatePropagation: function() {}
 };
 
 function remove_selected_top_models() {
-	for(var i=0; i < selected_for_removal.length; i++) {
-		selected_for_removal[i].canvas.dom_canvas.remove();
+	
+	while (selected_for_removal.length > 0) {
+		selected_for_removal[0].canvas.dom_canvas.remove();
 
 		for (var j = 0; j < canvas.length; j++) {
-			if (canvas[j].id == selected_for_removal[i].canvas.id) {
+			if (canvas[j].id == selected_for_removal[0].canvas.id) {
 				canvas.splice(j, 0);
 			}
 		}
-	}
 
-	selected_for_removal = [];
-	selected_structures = [];
+		selected_for_removal[0].select(evt);		
+	}
 }
 
 function expand_selected_structures() {
 	
-	for(var i=0; i < selected_structures.length; i++) {
-		new_model(selected_structures[i].structure);
-		selected_structures[i].select(event);
+	while (selected_structures.length > 0) {
+		new_model(selected_structures[0].structure);
+		selected_structures[0].select(evt);
 	}
-
-	selected_for_removal = [];
-	selected_structures = [];
 }
 
 function new_model(structure) {

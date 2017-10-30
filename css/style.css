@@ -26,7 +26,7 @@ label {
 
 #input_wrapper {
   margin-top: 20px;
-  width: 1200px;
+  width: 1000px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -38,7 +38,8 @@ label {
   margin-left: auto;
   margin-right: auto;
   text-align: left;
-  font-size: 20px;
+  font-size: 14px;
+  margin-bottom: 5px;
 }
 
 textarea {

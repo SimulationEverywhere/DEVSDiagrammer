@@ -7,7 +7,7 @@ function Canvas(parameters) {
 
 Canvas.prototype.initialize = function(parameters) {
     this.id = "stage_canvas_" + canvas.length.toString();
-    this.dom_canvas = $('<canvas/>',{'Width':1500,'Height':1500, 'id': this.id });
+    this.dom_canvas = $('<canvas/>',{'Width':1000,'Height':800, 'id': this.id });
     $('body').append(this.dom_canvas);
 
     this.stage = new createjs.Stage(this.dom_canvas.get(0));
