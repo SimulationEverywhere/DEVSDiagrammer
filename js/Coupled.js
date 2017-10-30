@@ -84,12 +84,18 @@ Coupled.prototype.draw_coupled = function() {
 
 Coupled.prototype.draw_name = function() {
 
-    var text_style = Math.floor(this.width * 0.08).toString() + "px Arial";
+    var text_style = "24px Arial";
     this.name = new createjs.Text(this.id, text_style, this.textColor);
     this.name.textBaseline = "top";
     this.name.y = 2;
     this.name.x = this.width / 2;
-    this.name.regX = this.name.getBounds().width / 2;
+    
+    var bounds = this.name.getBounds();
+    this.name.regX = bounds.width / 2;
+
+    this.name.scaleX = (this.width * 0.1) / bounds.width;
+    this.name.scaleY = this.name.scaleX;
+
     this.addChild(this.name);
 
     this.canvas.stage.update();
