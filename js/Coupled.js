@@ -1,4 +1,4 @@
-/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_structures, selected_for_removal,
+/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_for_add, selected_for_removal,
          manifest, options */
 /*exported Coupled */
 
@@ -42,9 +42,12 @@ Coupled.prototype.initialize = function(parameters) {
     if (this.is_top) {
         this.width = this.canvas.stageWidth * 0.85;
         this.height = this.canvas.stageHeight * 0.85;
-        this.x = (this.canvas.stageWidth - this.width) / 2;
-        this.y = (this.canvas.stageHeight - this.height) / 2;
+        this.x = this.canvas.stageWidth / 2;
+        this.y = this.canvas.stageHeight / 2;
     }
+
+    this.regX = this.width / 2;
+    this.regY = this.height / 2;
 
     this.draw_coupled();
 
@@ -185,9 +188,12 @@ Coupled.prototype.expand = function() {
         modelsHeight = Math.min(modelsWidth, modelsHeight);
     }
 
+    var modelVerticalSpace = (this.height / highestColum);
+    var modelHorizontalSpace = (this.width / modelsByColumns.length);
+
     for (j = 0; j < modelsByColumns.length; j++) {
         columnMoldes = modelsByColumns[j];
-        x = this.width * 0.075 + modelsWidth / 2 + j * modelsWidth * 2;
+        x = modelHorizontalSpace / 2 + j * modelHorizontalSpace;
         for (i = 0; i < columnMoldes.length; i++) {
 
             modelStructure = this.get_model(columnMoldes[i]);
@@ -198,7 +204,7 @@ Coupled.prototype.expand = function() {
                 structure: $.extend(true, {}, modelStructure) 
             });
             model.x = x;
-            model.y = this.height * 0.075 + modelsHeight / 2 + i * modelsHeight * 2;
+            model.y = modelVerticalSpace / 2 + i * modelVerticalSpace;
             this.addChild(model);
             this.models.push(model);
         }
