@@ -10,6 +10,7 @@
     <script src="vendors/js/createjs/createjs-2013.12.12.min.js"></script>
     <script src="vendors/js/jquery-3.2.1/jquery-3.2.1.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/manifest.js"></script>
     <script src="js/toposort.js"></script>
     <script src="js/Square.js"></script>
     <script src="js/Port.js"></script>
@@ -26,8 +27,14 @@
   </head>
   <body>
   <div id="input_wrapper">
-    <label for="model_structure"><bold>Insert the json DEVS model (JSON data)<bold></label>
+    <label for="model_structure"><bold>Insert the DEVS model (JSON data)<bold></label>
     <textarea id="model_structure" style="display: none"></textarea>
+  </div>
+  <div id="options_wrapper">
+    <ul>
+      <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();"> Squared models</textarea></li>
+      <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> show port message types</textarea></li>
+    </ul>
   </div>
   <div>
     <button id="generate" type="button" onclick="new_input_model();" style="display: none">Generate model</button>

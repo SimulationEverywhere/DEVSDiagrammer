@@ -6,7 +6,8 @@ function Canvas(parameters) {
 }
 
 Canvas.prototype.initialize = function(parameters) {
-    this.dom_canvas = $('<canvas/>',{'Width':1500,'Height':1500, 'id': "stage_canvas_" + canvas.length.toString() });
+    this.id = "stage_canvas_" + canvas.length.toString();
+    this.dom_canvas = $('<canvas/>',{'Width':1500,'Height':1500, 'id': this.id });
     $('body').append(this.dom_canvas);
 
     this.stage = new createjs.Stage(this.dom_canvas.get(0));
@@ -24,7 +25,6 @@ Canvas.prototype.initialize = function(parameters) {
     this.top_model = new Coupled({
     	is_top: true,
     	canvas: this,
-    	id: structure.id,
     	structure: structure,
     });
 

@@ -1,4 +1,5 @@
-/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_structures */
+/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_structures, selected_for_removal,
+         manifest, options */
 /*exported Coupled */
 
 "use strict";
@@ -36,6 +37,8 @@ Coupled.prototype.initialize = function(parameters) {
 
     $.extend(true, this, parameters);
 
+    this.id = this.structure.id;
+
     if (this.is_top) {
         this.width = this.canvas.stageWidth * 0.85;
         this.height = this.canvas.stageHeight * 0.85;
@@ -59,14 +62,16 @@ Coupled.empty_structure = {
 };
 
 Coupled.prototype.draw_coupled = function() {
-    this.model_box = new Square({
-        canvas: this.canvas,
-        width: this.width,
-        height: this.height,
-        radius: this.width * this.radius_percentage
-    });
-
-    this.addChild(this.model_box);
+    
+    if (this.structure.type === "coupled") {
+        this.background_color = manifest.coupled.background_color;
+        this.selected_color =  manifest.coupled.selected_color;
+    } else {
+        this.background_color = manifest.atomic.background_color;
+        this.selected_color = manifest.atomic.selected_color;
+    }
+    
+    this.changeColor(this.background_color);
     this.draw_name();
     this.draw_ports();
 
@@ -98,13 +103,12 @@ Coupled.prototype.draw_ports = function() {
 };
 
 Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outin) {
-    var i, height, width, port, margin;
+    var i, height, port, margin;
 
     this.clean(graphical_ports);
 
     height = (this.height * 0.9 / structure_ports.length) - 1;
     height = Math.min(height, Math.floor(this.height * 0.06));
-    width = height;
 
     margin = (this.height * 0.9 / structure_ports.length) - height;
 
@@ -113,7 +117,6 @@ Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outi
             canvas: this.canvas,
             outin: outin,
             fillColor: "#FFFFFF",
-            width: width,
             height: height,
             id: structure_ports[i].name,
             message_type: structure_ports[i].message_type,
@@ -177,6 +180,11 @@ Coupled.prototype.expand = function() {
     modelsWidth = Math.floor(this.width * 0.85 / (modelsByColumns.length * 2));
     modelsHeight = Math.floor(this.height * 0.85 / (highestColum * 2));
 
+    if (options.squared_models) {
+        modelsWidth = Math.min(modelsWidth, modelsHeight);
+        modelsHeight = Math.min(modelsWidth, modelsHeight);
+    }
+
     for (j = 0; j < modelsByColumns.length; j++) {
         columnMoldes = modelsByColumns[j];
         x = this.width * 0.075 + modelsWidth / 2 + j * modelsWidth * 2;
@@ -185,7 +193,6 @@ Coupled.prototype.expand = function() {
             modelStructure = this.get_model(columnMoldes[i]);
             model = new Coupled({
                 canvas: this.canvas,
-                id: modelStructure.id,
                 width: modelsWidth,
                 height: modelsHeight,
                 structure: $.extend(true, {}, modelStructure) 
@@ -328,6 +335,21 @@ Coupled.prototype.contract = function() {
     this.is_expanded = false;
 };
 
+Coupled.prototype.changeColor = function(color) {
+    this.removeChild(this.model_box);
+
+    this.model_box = new Square({
+        canvas: this.canvas,
+        width: this.width,
+        height: this.height,
+        radius: this.width * this.radius_percentage,
+        fillColor: color
+    });
+
+    this.addChildAt(this.model_box, 0);
+    this.canvas.stage.update();
+};
+
 Coupled.prototype.toggle = function(evt) {
     console.log("ID:", this.id, "Toggle");
     evt.stopImmediatePropagation();
@@ -348,11 +370,13 @@ Coupled.prototype.select = function(evt) {
     this.is_selected = !this.is_selected;
 
     if (this.is_selected) {
-        selected_structures.push(this.structure);
+        selected_structures.push(this);
 
         if (this.is_top) {
-            selected_for_removal.push({id: this.structure.id, canvas: this.canvas});            
+            selected_for_removal.push(this);            
         }
+
+        this.changeColor(this.selected_color);
 
     } else {
         var i = 0;
@@ -364,13 +388,15 @@ Coupled.prototype.select = function(evt) {
             }
         }
 
-        var i = 0;
+        i = 0;
         while (i < selected_for_removal.length) {
-            if (selected_for_removal[i].id === this.structure.id) {
+            if (selected_for_removal[i].id === this.id) {
                 selected_for_removal.splice(i,1);
             } else {
                 i++;
             }
         }
+
+        this.changeColor(this.background_color);
     }
 };
