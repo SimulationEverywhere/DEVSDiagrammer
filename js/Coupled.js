@@ -1,4 +1,4 @@
-/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_for_add, selected_for_removal,
+/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_models,
          manifest, options */
 /*exported Coupled */
 
@@ -51,7 +51,8 @@ Coupled.prototype.initialize = function(parameters) {
 
     this.draw_coupled();
 
-    this.addEventListener("dblclick", this.toggle.bind(this));
+    if (this.is_top) this.expand();
+
     this.addEventListener("pressup", this.select.bind(this));
 };
 
@@ -379,17 +380,13 @@ Coupled.prototype.changeColor = function(color) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.toggle = function(evt) {
-    console.log("ID:", this.id, "Toggle");
-    evt.stopImmediatePropagation();
+Coupled.prototype.toggle = function() {
 
     if (this.is_expanded) {
         this.contract();
     } else {
         this.expand();
     }
-
-    return false;
 };
 
 Coupled.prototype.select = function(evt) {
@@ -399,28 +396,14 @@ Coupled.prototype.select = function(evt) {
     this.is_selected = !this.is_selected;
 
     if (this.is_selected) {
-        selected_for_add.push(this);
-
-        if (this.is_top) {
-            selected_for_removal.push(this);            
-        }
-
+        selected_models.push(this);
         this.changeColor(this.selected_color);
 
     } else {
         var i = 0;
-        while (i < selected_for_add.length) {
-            if (selected_for_add[i].id === this.structure.id) {
-                selected_for_add.splice(i,1);
-            } else {
-                i++;
-            }
-        }
-
-        i = 0;
-        while (i < selected_for_removal.length) {
-            if (selected_for_removal[i].id === this.id) {
-                selected_for_removal.splice(i,1);
+        while (i < selected_models.length) {
+            if (selected_models[i].id === this.id) {
+                selected_models.splice(i,1);
             } else {
                 i++;
             }

@@ -1,12 +1,17 @@
 /*global $, createjs, Coupled, canvas */
 /*export Canvas */
 "use strict";
+
+var canvas_id = 0;
+
 function Canvas(parameters) {
 	this.initialize(parameters);
 }
 
 Canvas.prototype.initialize = function(parameters) {
-    this.id = "stage_canvas_" + canvas.length.toString();
+    this.id = "stage_canvas_" + canvas_id.toString();
+    this.canvas_id++;
+    
     this.dom_canvas = $('<canvas/>',{'Width':1000,'Height':800, 'id': this.id });
     $('body').append(this.dom_canvas);
 
