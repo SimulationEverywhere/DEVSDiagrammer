@@ -4,7 +4,7 @@
 
 var canvas = [];
 
-var selected_structures = [];
+var selected_for_add = [];
 var selected_for_removal = [];
 
 var options = {
@@ -33,9 +33,9 @@ function remove_selected_top_models() {
 
 function expand_selected_structures() {
 	
-	while (selected_structures.length > 0) {
-		new_model(selected_structures[0].structure);
-		selected_structures[0].select(evt);
+	while (selected_for_add.length > 0) {
+		new_model(selected_for_add[0].structure);
+		selected_for_add[0].select(evt);
 	}
 }
 

@@ -370,7 +370,7 @@ Coupled.prototype.select = function(evt) {
     this.is_selected = !this.is_selected;
 
     if (this.is_selected) {
-        selected_structures.push(this);
+        selected_for_add.push(this);
 
         if (this.is_top) {
             selected_for_removal.push(this);            
@@ -380,9 +380,9 @@ Coupled.prototype.select = function(evt) {
 
     } else {
         var i = 0;
-        while (i < selected_structures.length) {
-            if (selected_structures[i].id === this.structure.id) {
-                selected_structures.splice(i,1);
+        while (i < selected_for_add.length) {
+            if (selected_for_add[i].id === this.structure.id) {
+                selected_for_add.splice(i,1);
             } else {
                 i++;
             }
