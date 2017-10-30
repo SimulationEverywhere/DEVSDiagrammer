@@ -31,10 +31,28 @@ function remove_selected_top_models() {
 	}
 }
 
-function expand_selected_structures() {
+function expand_selected() {
 	
 	while (selected_for_add.length > 0) {
 		new_model(selected_for_add[0].structure);
+		selected_for_add[0].select(evt);
+	}
+}
+
+function unlink_selected() {
+	
+	while (selected_for_add.length > 0) {
+		selected_for_add[0].remove_links();
+		selected_for_add[0].select(evt);
+	}
+}
+
+function show_submodel_link_selected() {
+	
+	while (selected_for_add.length > 0) {
+		if (!selected_for_add[0].is_top) {
+			selected_for_add[0].parent.show_submodel_links(selected_for_add[0]);
+		}
 		selected_for_add[0].select(evt);
 	}
 }
@@ -50,12 +68,12 @@ function new_input_model() {
 }
 
 $(window).keydown(function (e) {
-
-  if (e.keyCode === 13) { // enter expands
-  	expand_selected_structures();  
-  } else if (e.keyCode === 46) { // suppr removes top models
-  	remove_selected_top_models();
-  }
+	switch(e.keyCode) {
+		case 13: expand_selected(); break;  
+		case 46: remove_selected_top_models(); break;
+		case 49: unlink_selected(); break;
+		case 50: show_submodel_link_selected(); break;
+	}
 });
 
 function update_options() {

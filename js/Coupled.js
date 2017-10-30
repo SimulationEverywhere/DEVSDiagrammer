@@ -161,6 +161,7 @@ Coupled.prototype.clean = function(models) {
 
 Coupled.prototype.expand = function() {
 
+
     if (this.structure.type === "atomic" ||
         this.structure.models.length === 0 ||
         this.is_expanded) { return; }
@@ -218,17 +219,18 @@ Coupled.prototype.expand = function() {
 };
 
 Coupled.prototype.draw_links = function() {
-    this.draw_ic();
-    this.draw_eic();
-    this.draw_eoc();
+    this.remove_links();
+
+    this.draw_ic(this.structure.ic);
+    this.draw_eic(this.structure.eic);
+    this.draw_eoc(this.structure.eoc);
 };
 
-Coupled.prototype.draw_ic = function() {
+Coupled.prototype.draw_ic = function(ics) {
     var port_in, port_out, ic, i;
-    this.clean(this.ic);
 
-    for (i = 0; i < this.structure.ic.length; i++) {
-        ic = this.structure.ic[i];
+    for (i = 0; i < ics.length; i++) {
+        ic = ics[i];
 
         port_out = this.getPort(ic.from_model, ic.from_port, Port.out);
         port_in = this.getPort(ic.to_model, ic.to_port, Port.in);
@@ -239,12 +241,11 @@ Coupled.prototype.draw_ic = function() {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.draw_eic = function() {
+Coupled.prototype.draw_eic = function(eics) {
     var port_in, port_out, eic, i;
-    this.clean(this.eic);
 
-    for (i = 0; i < this.structure.eic.length; i++) {
-        eic = this.structure.eic[i];
+    for (i = 0; i < eics.length; i++) {
+        eic = eics[i];
 
         port_out = this.getPort(this.id, eic.from_port, Port.in);
         port_in = this.getPort(eic.to_model, eic.to_port, Port.in);
@@ -255,12 +256,11 @@ Coupled.prototype.draw_eic = function() {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.draw_eoc = function() {
+Coupled.prototype.draw_eoc = function(eocs) {
     var port_in, port_out, eoc, i;
-    this.clean(this.eoc);
 
-    for (i = 0; i < this.structure.eoc.length; i++) {
-        eoc = this.structure.eoc[i];
+    for (i = 0; i < eocs.length; i++) {
+        eoc = eocs[i];
 
         port_out = this.getPort(eoc.from_model, eoc.from_port, Port.out);
         port_in = this.getPort(this.id, eoc.to_port, Port.out);
@@ -332,13 +332,36 @@ Coupled.prototype.get_model = function(id) {
 
 Coupled.prototype.contract = function() {
     
+    this.remove_links();
     this.clean(this.models);
+    this.canvas.stage.update();
+
+    this.is_expanded = false;
+};
+
+Coupled.prototype.remove_links = function() {
     this.clean(this.eic);
     this.clean(this.eoc);
     this.clean(this.ic);
     this.canvas.stage.update();
+};
 
-    this.is_expanded = false;
+Coupled.prototype.show_submodel_links = function(submodel) {
+    var ic = this.structure.ic.filter(function(link) {
+        return link.from_model === submodel.id || link.to_model === submodel.id;
+    });
+    var eic = this.structure.eic.filter(function(link) {
+        return link.to_model === submodel.id;
+    });
+    var eoc = this.structure.eoc.filter(function(link) {
+        return link.from_model === submodel.id;
+    });
+
+    this.draw_ic(ic);
+    this.draw_eic(eic);
+    this.draw_eoc(eoc);
+
+    this.canvas.stage.update();
 };
 
 Coupled.prototype.changeColor = function(color) {
