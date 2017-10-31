@@ -296,6 +296,8 @@ Coupled.prototype.connect = function(port_out, port_in) {
                                             this);
     line = new Line({
         canvas: this.canvas,
+        port_out: port_out,
+        port_in: port_in,
         nodes: [start_point, end_point],
         color: "#000000",
         width: 2,
@@ -375,6 +377,46 @@ Coupled.prototype.show_submodel_links = function(submodel) {
     this.draw_ic(ic);
     this.draw_eic(eic);
     this.draw_eoc(eoc);
+
+    this.canvas.stage.update();
+};
+
+Coupled.prototype.update_submodel_link = function(submodel) {
+    var i, port_out, port_in, submodel_ports_in, submodel_ports_out;
+
+    submodel_ports_in = submodel.ports.in.map(function(p) { return p.id; });
+    submodel_ports_out = submodel.ports.out.map(function(p) { return p.id; });
+    
+
+    for (i = 0; i < this.eic.length; i++) {
+        if (submodel_ports_in.indexOf(this.eic[i].port_in)) {
+            port_out = this.eic[i].port_out;
+            port_in = this.eic[i].port_in;
+            this.removeChild(this.eic[i]);
+            this.eic.splice(i, 1);
+            this.eic.push(this.connect(port_out, port_in));
+        }
+    }
+
+    for (i = 0; i < this.eoc.length; i++) {
+        if (submodel_ports_out.indexOf(this.eoc[i].port_out)) {
+            port_out = this.eoc[i].port_out;
+            port_in = this.eoc[i].port_in;
+            this.removeChild(this.eoc[i]);
+            this.eoc.splice(i, 1);
+            this.eoc.push(this.connect(port_out, port_in));
+        }
+    }
+
+    for (i = 0; i < this.ic.length; i++) {
+        if (submodel_ports_in.indexOf(this.ic[i].port_in) || submodel_ports_out.indexOf(this.ic[i].port_out)) {
+            port_out = this.ic[i].port_out;
+            port_in = this.ic[i].port_in;
+            this.removeChild(this.ic[i]);
+            this.ic.splice(i, 1);
+            this.ic.push(this.connect(port_out, port_in));
+        }
+    }
 
     this.canvas.stage.update();
 };
@@ -505,7 +547,7 @@ Coupled.prototype.move = function(evt) {
             this.dragged = true;
         }
 
-        this.parent.draw_links();
+        this.parent.update_submodel_link(this);
 
         this.canvas.stage.update();
     }

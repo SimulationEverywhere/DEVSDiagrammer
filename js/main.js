@@ -37,7 +37,7 @@ function expand_in_new_canvas_selected() {
 function remove_links_selected() {
 	
 	while (selected_models.length > 0) {
-		selected_models[0].remove_links();
+		selected_models[0].remove_links(false);
 		selected_models[0].select(evt);
 	}
 }
