@@ -539,17 +539,7 @@ Coupled.prototype.move = function(evt) {
     
     if (this.holding) {
         console.log("ID:", this.id, "move");
-        var mose_local_position = this.parent.globalToLocal(evt.stageX, evt.stageY);
-        this.x = mose_local_position.x - this.mouse_offset.x;
-        this.y = mose_local_position.y - this.mouse_offset.y;
-
-        if (!this.dragged && this.distance(this, this.original_position) > 1) {
-            this.dragged = true;
-        }
-
-        this.parent.update_submodel_link(this);
-
-        this.canvas.stage.update();
+        this.update_position(evt);
     }
 };
 
@@ -558,4 +548,19 @@ Coupled.prototype.release = function(evt) {
     
     console.log("ID: ", this.id, "release");
     this.holding = false;
+    this.update_position(evt);
+};
+
+Coupled.prototype.update_position = function (evt) {
+
+    var mose_local_position = this.parent.globalToLocal(evt.stageX, evt.stageY);
+    this.x = mose_local_position.x - this.mouse_offset.x;
+    this.y = mose_local_position.y - this.mouse_offset.y;
+
+    if (!this.dragged && this.distance(this, this.original_position) > 1) {
+        this.dragged = true;
+    }
+
+    this.parent.update_submodel_link(this);
+    this.canvas.stage.update();
 };
