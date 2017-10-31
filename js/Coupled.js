@@ -54,7 +54,10 @@ Coupled.prototype.initialize = function(parameters) {
 
     if (this.is_top) this.expand();
 
-    this.addEventListener("pressup", this.select.bind(this));
+    this.addEventListener("click", this.select.bind(this));
+    this.addEventListener("mousedown", this.hold.bind(this));
+    this.addEventListener("pressmove", this.move.bind(this));
+    this.addEventListener("pressup", this.release.bind(this));
 };
 
 Coupled.empty_structure = {
@@ -400,30 +403,6 @@ Coupled.prototype.toggle = function() {
     }
 };
 
-Coupled.prototype.select = function(evt) {
-    console.log("ID:", this.id, "Select");
-    evt.stopImmediatePropagation();
-
-    this.is_selected = !this.is_selected;
-
-    if (this.is_selected) {
-        selected_models.push(this);
-        this.changeColor(this.selected_color);
-
-    } else {
-        var i = 0;
-        while (i < selected_models.length) {
-            if (selected_models[i].id === this.id) {
-                selected_models.splice(i,1);
-            } else {
-                i++;
-            }
-        }
-
-        this.changeColor(this.background_color);
-    }
-};
-
 Coupled.prototype.toggle_port_names = function() {
     
     if (this.shows_port_names) {
@@ -431,7 +410,6 @@ Coupled.prototype.toggle_port_names = function() {
     } else {
         this.show_port_names();
     }
-
 };
 
 Coupled.prototype.show_port_names = function() {
@@ -467,4 +445,75 @@ Coupled.prototype.hide_port_names = function() {
         this.models[i].hide_port_names();
     }
     this.shows_port_names = false;
+};
+
+Coupled.prototype.distance = function(a, b) {
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+};
+
+Coupled.prototype.select = function(evt) {
+    evt.stopImmediatePropagation();
+
+    if (this.dragged) { return; }
+    console.log("ID:", this.id, "Select");
+
+    this.is_selected = !this.is_selected;
+
+    if (this.is_selected) {
+        selected_models.push(this);
+        this.changeColor(this.selected_color);
+
+    } else {
+        var i = 0;
+        while (i < selected_models.length) {
+            if (selected_models[i].id === this.id) {
+                selected_models.splice(i,1);
+            } else {
+                i++;
+            }
+        }
+
+        this.changeColor(this.background_color);
+    }
+};
+
+Coupled.prototype.hold = function(evt) {
+    evt.stopImmediatePropagation();
+    
+    if (!this.holding && !this.is_top) {
+        console.log("ID:", this.id, "hold");
+        this.holding = true;
+        this.mouse_offset = this.parent.globalToLocal(evt.stageX, evt.stageY);
+        this.mouse_offset.x -= this.x;
+        this.mouse_offset.y -= this.y;
+        this.original_position = {x: this.x, y: this.y};
+        this.dragged = false;
+        console.log(this.mouse_offset);
+    }
+};
+
+Coupled.prototype.move = function(evt) {
+    evt.stopImmediatePropagation();
+    
+    if (this.holding) {
+        console.log("ID:", this.id, "move");
+        var mose_local_position = this.parent.globalToLocal(evt.stageX, evt.stageY);
+        this.x = mose_local_position.x - this.mouse_offset.x;
+        this.y = mose_local_position.y - this.mouse_offset.y;
+
+        if (!this.dragged && this.distance(this, this.original_position) > 1) {
+            this.dragged = true;
+        }
+
+        this.parent.draw_links();
+
+        this.canvas.stage.update();
+    }
+};
+
+Coupled.prototype.release = function(evt) {
+    evt.stopImmediatePropagation();
+    
+    console.log("ID: ", this.id, "release");
+    this.holding = false;
 };
