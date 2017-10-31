@@ -1,5 +1,5 @@
 /*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_models,
-         manifest, options */
+         manifest, options, sort_ports */
 /*exported Coupled */
 
 "use strict";
@@ -116,23 +116,25 @@ Coupled.prototype.draw_ports = function() {
 };
 
 Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outin) {
-    var i, height, port, margin;
+    var i, height, port, margin, sorted_structure_ports;
 
     this.clean(graphical_ports);
 
-    height = (this.height * 0.9 / structure_ports.length) - 1;
+    sorted_structure_ports = sort_ports(structure_ports);
+
+    height = (this.height * 0.9 / sorted_structure_ports.length) - 1;
     height = Math.min(height, Math.floor(this.height * 0.06));
 
-    margin = (this.height * 0.9 / structure_ports.length) - height;
+    margin = (this.height * 0.9 / sorted_structure_ports.length) - height;
 
-    for(i = 0; i < structure_ports.length; ++i) {
+    for(i = 0; i < sorted_structure_ports.length; ++i) {
         port = new Port({
             canvas: this.canvas,
             outin: outin,
             fillColor: "#FFFFFF",
             height: height,
-            id: structure_ports[i].name,
-            message_type: structure_ports[i].message_type,
+            id: sorted_structure_ports[i].name,
+            message_type: sorted_structure_ports[i].message_type,
             font_size: height * 0.4
         });
 

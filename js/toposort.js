@@ -1,4 +1,5 @@
-/*exported relaxed_khan */
+/*global options */
+/*exported relaxed_khan, sort_ports */
 "use strict";
 
 /**
@@ -108,4 +109,17 @@ function extract_models_by_column(L) {
 			return node.model;
 		});
 	});
+}
+
+function sort_ports(ports) {
+	
+	if (options.sort_ports_by_name) {
+		return ports.sort(function(a, b) { 
+			if (a.name < b.name) return -1;
+			if (a.name > b.name) return 1;
+			return 0;
+		});
+	}
+
+	else return ports;
 }
