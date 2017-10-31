@@ -16,6 +16,7 @@ Line.prototype.initialize = function(parameters) {
     this.ShapeInitialize();
     $.extend(true, this, parameters);
 
+    this.check_min_values();
     this.draw_line();
 };
 
@@ -32,3 +33,7 @@ Line.prototype.draw_line = function() {
     }
     this.canvas.stage.update();
 };
+
+Line.prototype.check_min_values = function() {
+    this.width = Math.max(this.width, 1);
+}

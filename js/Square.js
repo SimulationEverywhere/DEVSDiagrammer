@@ -23,10 +23,11 @@ Square.prototype.initialize = function(parameters) {
 
     $.extend(true, this, parameters);
 
-    this.draw_Square();
+    this.check_min_values();
+    this.draw_square();
 };
 
-Square.prototype.draw_Square = function() {
+Square.prototype.draw_square = function() {
     var i;
 
     this.graphics = new createjs.Graphics();
@@ -37,3 +38,9 @@ Square.prototype.draw_Square = function() {
 
     this.canvas.stage.update();
 };
+
+Square.prototype.check_min_values = function() {
+    this.width = Math.max(this.width, 1);
+    this.height = Math.max(this.height, 1);
+    this.radius = Math.max(this.radius, 0);
+}

@@ -1,4 +1,4 @@
-/*global createjs, $, Square, manifest */
+/*global createjs, $, Square, manifest, options */
 /*exported Port */
 "use strict";
 
@@ -44,9 +44,10 @@ Port.prototype.draw_box = function() {
         height: this.height
     });
     this.addChild(this.port_box);
-}
+};
 
 Port.prototype.draw_name = function() {
+
 
     var text_style = this.font_size.toString() + "px Arial";
     this.port_name = new createjs.Text(this.id, text_style, this.text_color);
@@ -55,8 +56,12 @@ Port.prototype.draw_name = function() {
     this.port_name.y = 2;
     this.port_name.x = this.width / 2;
     this.port_name.regX = this.port_name.getBounds().width / 2;
-
+    
     this.addChild(this.port_name);
+    
+    if (!options.show_port_name) {
+        this.port_name.visible = true;
+    }
 };
 
 Port.prototype.draw_message_type = function() {
@@ -71,4 +76,19 @@ Port.prototype.draw_message_type = function() {
 
 
     this.addChild(this.port_message_type);
+};
+
+Port.prototype.toggle_name = function() {
+    this.port_name.visible = !this.port_name.visible;
+    this.canvas.stage.update();
+};
+
+Port.prototype.hide_name = function() {
+    this.port_name.visible = false;
+    this.canvas.stage.update();
+};
+
+Port.prototype.show_name = function() {
+    this.port_name.visible = true;
+    this.canvas.stage.update();
 };

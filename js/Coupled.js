@@ -19,6 +19,7 @@ Coupled.prototype.initialize = function(parameters) {
     /********** Coupled structure ************/
     this.is_top = false;
     this.is_expanded = false;
+    this.shows_port_names = options.show_port_name;
     this.structure = $.extend(true, {}, Coupled.empty_structure);
 
     /******* graphical components **********/
@@ -419,4 +420,49 @@ Coupled.prototype.select = function(evt) {
 
         this.changeColor(this.background_color);
     }
+};
+
+Coupled.prototype.toggle_port_names = function() {
+    
+    if (this.shows_port_names) {
+        this.hide_port_names();
+    } else {
+        this.show_port_names();
+    }
+
+};
+
+Coupled.prototype.show_port_names = function() {
+    var i;
+
+    for(i = 0; i < this.ports.in.length; i++) {
+        this.ports.in[i].show_name();
+    }
+
+    for(i = 0; i < this.ports.out.length; i++) {
+        this.ports.out[i].show_name();
+    }
+
+    for(i = 0; i < this.models.length; i++) {
+        this.models[i].show_port_names();
+    }
+
+    this.shows_port_names = true;
+};
+
+Coupled.prototype.hide_port_names = function() {
+    var i;
+
+    for(i = 0; i < this.ports.in.length; i++) {
+        this.ports.in[i].hide_name();
+    }
+
+    for(i = 0; i < this.ports.out.length; i++) {
+        this.ports.out[i].hide_name();
+    }
+
+    for(i = 0; i < this.models.length; i++) {
+        this.models[i].hide_port_names();
+    }
+    this.shows_port_names = false;
 };
