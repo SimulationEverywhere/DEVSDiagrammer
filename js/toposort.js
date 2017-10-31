@@ -19,7 +19,10 @@ function relaxed_khan(graph) {
 		L.push(n);
 	}
 
-	return separate_in_columns(L);
+	L = separate_in_columns(L);
+	if (options.compress_in_left) L = compress_columns_in_left(L);
+
+	return extract_models_by_column(L);
 }
 
 function degree_comparator(graph, a, b) {
@@ -50,7 +53,7 @@ function in_degree(graph, node) {
 function separate_in_columns(sorted_graph) {
 	var i, res, neighbors, node;
 
-	res = [[sorted_graph[0].model]];
+	res = [[sorted_graph[0]]];
 	neighbors = sorted_graph[0].neighbors;
 
 	for(i = 1; i < sorted_graph.length; i++) {
@@ -58,12 +61,51 @@ function separate_in_columns(sorted_graph) {
 		node = sorted_graph[i];
 		if(neighbors.indexOf(node.model) === -1) { // if is no neighbor it can be placed in the same column
 			neighbors = neighbors.concat(node.neighbors);
-			res[res.length - 1].push(node.model);
+			res[res.length - 1].push(node);
 		} else { // if is a neighbor, a new column must start
-			res.push([node.model]);
+			res.push([node]);
 			neighbors = node.neighbors;
 		}
 	}
 
 	return res;
+}
+
+function compress_columns_in_left(nodesByColumns) {
+	var i, n, node, column, new_location, neighbors;
+	for(i = 1; i < nodesByColumns.length; i++) {
+		column = nodesByColumns[i];
+
+		for(n = 0; n < column.length; n++) {
+			node = column[n];
+			new_location = i;
+			neighbors = get_neighbors(nodesByColumns[new_location - 1]);
+			while (new_location > 0 && neighbors.indexOf(node.model) === -1) {
+				new_location--;
+				if (new_location > 0) {
+					neighbors = get_neighbors(nodesByColumns[new_location - 1]);
+				}
+			}
+
+			if (new_location < i) {
+				nodesByColumns[i].splice(n, 1);
+				nodesByColumns[new_location].push(node);
+			}
+		}
+	}
+	return nodesByColumns;
+}
+
+function get_neighbors(column) {
+	return column.reduce(function(neighbors, node) {
+	  return neighbors.concat(node.neighbors);
+	}, []);
+}
+
+function extract_models_by_column(L) {
+	return L.map(function(column) { 
+		return column.map(function(node) { 
+			return node.model;
+		});
+	});
 }

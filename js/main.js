@@ -8,6 +8,7 @@ var options = {
 	squared_models : false,
 	show_message_type : false,
 	show_port_name : true,
+	compress_in_left : false,
 };
 
 var evt = {
@@ -89,4 +90,5 @@ function update_options() {
 	options.squared_models = $('input[name="squared_models"]:checked').length > 0;
 	options.show_message_type = $('input[name="show_message_type"]:checked').length > 0;
 	options.show_port_name = $('input[name="show_port_name"]:checked').length > 0;
+	options.compress_in_left = $('input[name="compress_in_left"]:checked').length > 0;
 }
