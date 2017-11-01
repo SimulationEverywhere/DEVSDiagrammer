@@ -16,5 +16,12 @@ var manifest = {
         text_color: "#000000",
         font_size: 12,
         ratio: 1.5, // two time more width than height
+    },
+
+    link: {
+        color: "#000000",
+        margin: 5,
+        epsilon: 0.5,
+        node_epsilon: 2
     }
 };
