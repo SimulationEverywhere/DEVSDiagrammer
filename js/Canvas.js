@@ -1,8 +1,17 @@
-/*global $, createjs, Coupled, canvas */
+/*global $, createjs, Model, canvas */
 /*export Canvas */
 "use strict";
 
 var canvas_id = 0;
+
+/**
+ * @class Canvas
+ * @author Laouen Mayal Louan Belloli
+ *
+ * @description Represent a canvas where a Model is displayed.
+ * It creates the DOM canvas, append it to the html body and initialize a new createjs.Stage
+ * and subStage container.
+ */
 
 function Canvas(parameters) {
 	this.initialize(parameters);
@@ -27,7 +36,7 @@ Canvas.prototype.initialize = function(parameters) {
         structure = JSON.parse($(parameters.structure_input_id).val());
     }
     
-    this.top_model = new Coupled({
+    this.top_model = new Model({
     	is_top: true,
     	canvas: this,
     	structure: structure,

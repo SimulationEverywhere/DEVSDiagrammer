@@ -2,6 +2,16 @@
 /*exported Line*/
 "use strict";
 
+/**
+ * @class Line
+ * @author Laouen Mayal Louan Belloli
+ * 
+ * @description Displays a graphical vectorized lines represented by a list of nodes in its local 
+ * reference space. Each node can be dragged to a new position, and new nodes can be created by 
+ * dragging a point witin the line. The new node is placed in between the two adjacents nodes of the
+ * line containing the selected point.
+ */
+
 function Line(parameters) {
     /*jshint validthis:true */
     this.initialize(parameters);
@@ -11,6 +21,14 @@ Line.prototype = new createjs.Shape();
 Line.prototype.ShapeInitialize = Line.prototype.initialize;
 Line.prototype.ContainerTick = Line.prototype._tick;
 
+/**
+ * Construct a new Line instance
+ * @param  {Object} parameters - all the required parameters to construct a new instance.
+ * @param {[Object]} parameters.nodes - the sorted list of nodes, a node is an object with attributes x and y.
+ * @param {Canvas} parameters.canvas - The canvas where the line belongs to update the stage.
+ * @param {String} parameters.color - The line colo in RGB format.
+ * @param {Number} parameters.width - The line width in pixels.
+ */
 Line.prototype.initialize = function(parameters) {
     
     this.ShapeInitialize();
@@ -90,6 +108,8 @@ Line.prototype.get_new_node_index = function(node) {
         }
     }
 };
+
+/********* Drag & drop ******************/
 
 Line.prototype.hold = function(evt) {
     var local_position, node, index;

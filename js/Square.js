@@ -2,10 +2,24 @@
 /*exported Square*/
 "use strict";
 
+/**
+ * @class Square
+ * @author Laouen Mayal Louan Belloli
+ *
+ * @description Display a square with background color, border color and border radius.
+ */
+
 function Square(parameters) {
     /*jshint validthis:true */
     this.initialize(parameters);
 }
+
+/**
+ * Initialize a new Square instance.
+ *
+ * @param {Object} parameters - all the requiered parameters to initialize the instance.
+ * 
+ */
 
 Square.prototype = new createjs.Shape();
 Square.prototype.ShapeInitialize = Square.prototype.initialize;

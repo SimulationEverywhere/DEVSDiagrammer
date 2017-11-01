@@ -1,26 +1,42 @@
 /*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_models,
          manifest, options, sort_ports */
-/*exported Coupled */
+/*exported Model */
 
 "use strict";
-function Coupled(parameters) {
+function Model(parameters) {
     /*jshint validthis:true */
     this.initialize(parameters);
 }
 
-Coupled.prototype = new createjs.Container();
-Coupled.prototype.ContainerInitialize = Coupled.prototype.initialize;
-Coupled.prototype.ContainerTick = Coupled.prototype._tick;
+/**
+ * @class Model
+ * @author Laouen Mayal Louan Belloli
+ *
+ * @description Represents and displays an entire model and its internal structure, EIC, IC, EOC,
+ * ports, submodels (each submodel is a Model class). 
+ */
 
-Coupled.prototype.initialize = function(parameters) {
+Model.prototype = new createjs.Container();
+Model.prototype.ContainerInitialize = Model.prototype.initialize;
+Model.prototype.ContainerTick = Model.prototype._tick;
+
+
+/**
+ * Constructs a new Model instance 
+ * @param {Object} parameters - All the required parameters to initialize the instance.
+ * @param {Boolean} parameters.is_top - indicates whether the models is TOP or submodel.
+ * @param {Canvas} parameters.canvas - The canvas where the model belongs to update the stage.
+ * @param {JSON} parameters.structure - The model JSON structure.
+ */
+Model.prototype.initialize = function(parameters) {
     this.ContainerInitialize();
 
 
-    /********** Coupled structure ************/
+    /********** Model structure ************/
     this.is_top = false;
     this.is_expanded = false;
     this.shows_port_names = options.show_port_name;
-    this.structure = $.extend(true, {}, Coupled.empty_structure);
+    this.structure = $.extend(true, {}, Model.empty_structure);
 
     /******* graphical components **********/
     this.ports = {in: [], out: []};
@@ -60,7 +76,7 @@ Coupled.prototype.initialize = function(parameters) {
     this.addEventListener("pressup", this.release.bind(this));
 };
 
-Coupled.empty_structure = {
+Model.empty_structure = {
     type: "atomic", // by default asumes it's an empty atomic model
     models: [],
     ic: [],
@@ -69,7 +85,7 @@ Coupled.empty_structure = {
     eic: [],
 };
 
-Coupled.prototype.draw_coupled = function() {
+Model.prototype.draw_coupled = function() {
     
     if (this.structure.type === "coupled") {
         this.background_color = manifest.coupled.background_color;
@@ -86,7 +102,7 @@ Coupled.prototype.draw_coupled = function() {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.draw_name = function() {
+Model.prototype.draw_name = function() {
 
     var text_style = "24px Arial";
     this.name = new createjs.Text(this.id, text_style, this.textColor);
@@ -107,18 +123,18 @@ Coupled.prototype.draw_name = function() {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.draw_ports = function() {
+Model.prototype.draw_ports = function() {
     
     this.clean(this.ports.in);
     this.clean(this.ports.out);
 
-    this.add_ports(this.structure.ports.in, this.ports.in, 0, Port.in);
-    this.add_ports(this.structure.ports.out, this.ports.out, this.width, Port.out);
+    this.add_ports(this.structure.ports.in, this.ports.in, 0);
+    this.add_ports(this.structure.ports.out, this.ports.out, this.width);
 
     this.canvas.stage.update();
 };
 
-Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outin) {
+Model.prototype.add_ports = function(structure_ports, graphical_ports, x) {
     var i, height, port, margin, sorted_structure_ports;
 
     this.clean(graphical_ports);
@@ -133,7 +149,6 @@ Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outi
     for(i = 0; i < sorted_structure_ports.length; ++i) {
         port = new Port({
             canvas: this.canvas,
-            outin: outin,
             fillColor: "#FFFFFF",
             height: height,
             id: sorted_structure_ports[i].name,
@@ -148,7 +163,7 @@ Coupled.prototype.add_ports = function(structure_ports, graphical_ports, x, outi
     }
 };
 
-Coupled.prototype.calculate_submodel_positions = function() {
+Model.prototype.calculate_submodel_positions = function() {
     var graph, models, ic, i, j, node;
 
     graph = [];
@@ -167,14 +182,14 @@ Coupled.prototype.calculate_submodel_positions = function() {
     return relaxed_khan(graph);
 };
 
-Coupled.prototype.clean = function(models) {
+Model.prototype.clean = function(models) {
     while (models.length > 0) {
         this.removeChild(models[0]);
         models.splice(0,1);
     }
 };
 
-Coupled.prototype.expand = function() {
+Model.prototype.expand = function() {
 
 
     if (this.structure.type === "atomic" ||
@@ -213,7 +228,7 @@ Coupled.prototype.expand = function() {
         for (i = 0; i < columnMoldes.length; i++) {
 
             modelStructure = this.get_model(columnMoldes[i]);
-            model = new Coupled({
+            model = new Model({
                 canvas: this.canvas,
                 width: modelsWidth,
                 height: modelsHeight,
@@ -233,7 +248,7 @@ Coupled.prototype.expand = function() {
     this.is_expanded = true;
 };
 
-Coupled.prototype.draw_links = function() {
+Model.prototype.draw_links = function() {
     this.remove_links();
 
     this.draw_ic(this.structure.ic);
@@ -241,7 +256,7 @@ Coupled.prototype.draw_links = function() {
     this.draw_eoc(this.structure.eoc);
 };
 
-Coupled.prototype.draw_ic = function(ics) {
+Model.prototype.draw_ic = function(ics) {
     var port_in, port_out, ic, i;
 
     for (i = 0; i < ics.length; i++) {
@@ -256,7 +271,7 @@ Coupled.prototype.draw_ic = function(ics) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.draw_eic = function(eics) {
+Model.prototype.draw_eic = function(eics) {
     var port_in, port_out, eic, i;
 
     for (i = 0; i < eics.length; i++) {
@@ -271,7 +286,7 @@ Coupled.prototype.draw_eic = function(eics) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.draw_eoc = function(eocs) {
+Model.prototype.draw_eoc = function(eocs) {
     var port_in, port_out, eoc, i;
 
     for (i = 0; i < eocs.length; i++) {
@@ -286,7 +301,7 @@ Coupled.prototype.draw_eoc = function(eocs) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.connect = function(port_out, port_in) {
+Model.prototype.connect = function(port_out, port_in) {
     var start_point, end_point, line;
     start_point = port_out.parent.localToLocal( port_out.x + port_out.width - port_out.regX,
                                                 port_out.y - port_out.regY + port_out.height / 2,
@@ -307,7 +322,7 @@ Coupled.prototype.connect = function(port_out, port_in) {
     return line;
 };
 
-Coupled.prototype.getPort = function(model_id, port_id, inout) {
+Model.prototype.getPort = function(model_id, port_id, inout) {
     var model, ports, i;
 
     model = this.getModel(model_id);
@@ -325,7 +340,7 @@ Coupled.prototype.getPort = function(model_id, port_id, inout) {
     }
 };
 
-Coupled.prototype.getModel = function(model_id) {
+Model.prototype.getModel = function(model_id) {
     var i;
 
     if (model_id === this.id) {
@@ -339,7 +354,7 @@ Coupled.prototype.getModel = function(model_id) {
     }  
 };
 
-Coupled.prototype.get_model = function(id) {
+Model.prototype.get_model = function(id) {
     for (var i = 0; i < this.structure.models.length; i++) {
         if (this.structure.models[i].id == id) {
             return this.structure.models[i];
@@ -347,7 +362,7 @@ Coupled.prototype.get_model = function(id) {
     }
 };
 
-Coupled.prototype.contract = function() {
+Model.prototype.contract = function() {
     
     this.remove_links();
     this.clean(this.models);
@@ -356,14 +371,14 @@ Coupled.prototype.contract = function() {
     this.is_expanded = false;
 };
 
-Coupled.prototype.remove_links = function() {
+Model.prototype.remove_links = function() {
     this.clean(this.eic);
     this.clean(this.eoc);
     this.clean(this.ic);
     this.canvas.stage.update();
 };
 
-Coupled.prototype.show_submodel_links = function(submodel) {
+Model.prototype.show_submodel_links = function(submodel) {
     var ic = this.structure.ic.filter(function(link) {
         return link.from_model === submodel.id || link.to_model === submodel.id;
     });
@@ -381,7 +396,7 @@ Coupled.prototype.show_submodel_links = function(submodel) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.update_submodel_link = function(submodel) {
+Model.prototype.update_submodel_link = function(submodel) {
     var i, port_out, port_in, submodel_ports_in, submodel_ports_out;
 
     submodel_ports_in = submodel.ports.in.map(function(p) { return p.id; });
@@ -421,7 +436,7 @@ Coupled.prototype.update_submodel_link = function(submodel) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.changeColor = function(color) {
+Model.prototype.changeColor = function(color) {
     this.removeChild(this.model_box);
 
     this.model_box = new Square({
@@ -436,7 +451,7 @@ Coupled.prototype.changeColor = function(color) {
     this.canvas.stage.update();
 };
 
-Coupled.prototype.toggle = function() {
+Model.prototype.toggle = function() {
 
     if (this.is_expanded) {
         this.contract();
@@ -445,7 +460,7 @@ Coupled.prototype.toggle = function() {
     }
 };
 
-Coupled.prototype.toggle_port_names = function() {
+Model.prototype.toggle_port_names = function() {
     
     if (this.shows_port_names) {
         this.hide_port_names();
@@ -454,7 +469,7 @@ Coupled.prototype.toggle_port_names = function() {
     }
 };
 
-Coupled.prototype.show_port_names = function() {
+Model.prototype.show_port_names = function() {
     var i;
 
     for(i = 0; i < this.ports.in.length; i++) {
@@ -472,7 +487,7 @@ Coupled.prototype.show_port_names = function() {
     this.shows_port_names = true;
 };
 
-Coupled.prototype.hide_port_names = function() {
+Model.prototype.hide_port_names = function() {
     var i;
 
     for(i = 0; i < this.ports.in.length; i++) {
@@ -489,11 +504,13 @@ Coupled.prototype.hide_port_names = function() {
     this.shows_port_names = false;
 };
 
-Coupled.prototype.distance = function(a, b) {
+Model.prototype.distance = function(a, b) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 };
 
-Coupled.prototype.select = function(evt) {
+/*********** Drag & Drop *****************/
+
+Model.prototype.select = function(evt) {
     evt.stopImmediatePropagation();
 
     if (this.dragged) { return; }
@@ -519,7 +536,7 @@ Coupled.prototype.select = function(evt) {
     }
 };
 
-Coupled.prototype.hold = function(evt) {
+Model.prototype.hold = function(evt) {
     evt.stopImmediatePropagation();
     
     if (!this.holding && !this.is_top) {
@@ -534,7 +551,7 @@ Coupled.prototype.hold = function(evt) {
     }
 };
 
-Coupled.prototype.move = function(evt) {
+Model.prototype.move = function(evt) {
     evt.stopImmediatePropagation();
     
     if (this.holding) {
@@ -543,7 +560,7 @@ Coupled.prototype.move = function(evt) {
     }
 };
 
-Coupled.prototype.release = function(evt) {
+Model.prototype.release = function(evt) {
     evt.stopImmediatePropagation();
     
     console.log("ID: ", this.id, "release");
@@ -551,7 +568,7 @@ Coupled.prototype.release = function(evt) {
     this.update_position(evt);
 };
 
-Coupled.prototype.update_position = function (evt) {
+Model.prototype.update_position = function (evt) {
 
     var mose_local_position = this.parent.globalToLocal(evt.stageX, evt.stageY);
     this.x = mose_local_position.x - this.mouse_offset.x;

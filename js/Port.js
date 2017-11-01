@@ -2,6 +2,13 @@
 /*exported Port */
 "use strict";
 
+/**
+ * @class Port
+ * @author Laouen Mayal Louan Belloli
+ *
+ * @description Displays a model port with the port name and message type.
+ */
+
 function Port(parameters) {
 	this.initialize(parameters);
 }
@@ -12,6 +19,18 @@ Port.in = "in";
 Port.prototype = new createjs.Container();
 Port.prototype.ContainerInitialize = Port.prototype.initialize;
 Port.prototype.ContainerTick = Port.prototype._tick;
+
+/**
+ * Constructs a new Port instance.
+ *
+ * @param {Object} parameters - All the required parameters to the instance initialization.
+ * @param {Canvas} parameters.canvas - The canvas where it belongs to update the stage.
+ * @param {String} parameters.fillColor - The port background color in RGB format.
+ * @param {Number} parameters.height - The port height in pixels.
+ * @param {String} parameters.id - The port id.
+ * @param {String} parameters.message_type - The name of the port message type.
+ * @param {String} parameters.font_size - The font size of the port name and message type. 
+ */
 
 Port.prototype.initialize = function(parameters) {
     this.ContainerInitialize();
