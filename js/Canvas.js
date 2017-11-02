@@ -1,4 +1,4 @@
-/*global $, createjs, Model, canvas */
+/*global $, createjs, Model, JSONModelGraphics */
 /*export Canvas */
 "use strict";
 
@@ -35,11 +35,17 @@ Canvas.prototype.initialize = function(parameters) {
     if (structure === undefined || structure === null) {
         structure = JSON.parse($(parameters.structure_input_id).val());
     }
+
+    var jsonGraphics = parameters.jsonGraphics;
+    if (jsonGraphics === undefined || jsonGraphics === null) {
+        jsonGraphics = new JSONModelGraphics({ id: structure.id });
+    }
     
     this.top_model = new Model({
     	is_top: true,
     	canvas: this,
     	structure: structure,
+        jsonGraphics: jsonGraphics
     });
 
     this.subStage.addChild(this.top_model);

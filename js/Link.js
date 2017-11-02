@@ -150,7 +150,7 @@ Link.prototype.release = function(evt) {
         this.holded = false;
         this.merge_nodes();
         this.update_position(evt);
-        this.parent.logicalModel.update_link_nodes(this.kind, this.information, this.nodes);
+        this.parent.jsonGraphics.update_link_nodes(this.kind, this.information, this.nodes);
     }
 };
 
@@ -179,5 +179,5 @@ Link.prototype.create_node = function(local_position) {
     index = this.get_new_node_index(this.holded_node);
     this.nodes.splice(index, 0, this.holded_node);
 
-    this.parent.logicalModel.add_node_to_link(this.kind, this.information, this.holded_node, index);
+    this.parent.jsonGraphics.add_node_to_link(this.kind, this.information, this.holded_node, index);
 };

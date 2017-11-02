@@ -1,4 +1,4 @@
-/*global $, Canvas, console */
+/*global $, Canvas, console, JSONModelGraphics */
 /*exported main, new_input_model, update_options */
 "use strict";
 
@@ -29,7 +29,7 @@ function remove_selected_top_models() {
 function expand_in_new_canvas_selected() {
 	
 	while (selected_models.length > 0) {
-		new_model(selected_models[0].structure);
+		new_model(selected_models[0].structure, selected_models[0].jsonGraphics.json);
 		selected_models[0].select(evt);
 	}
 }
@@ -66,8 +66,14 @@ function toggle_port_name_selected() {
 	}
 }
 
-function new_model(structure) {
-	new Canvas({ structure: structure });
+function new_model(structure, jsonGraphics) {
+	new Canvas({
+		structure: structure,
+		jsonGraphics: new JSONModelGraphics({
+			id: jsonGraphics.id,
+			json: $.extend(true, {}, jsonGraphics)
+		})
+	});
 }
 
 function new_input_model() {

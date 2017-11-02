@@ -1,5 +1,5 @@
 /*global console, createjs, $, Square, Port, Link, relaxed_khan, selected_models,
-         manifest, options, sort_ports, LogicalModel */
+         manifest, options, sort_ports, JSONModelGraphics */
 /*exported Model */
 
 "use strict";
@@ -59,15 +59,14 @@ Model.prototype.initialize = function(parameters) {
 
     /********** logical model ***************/
 
-    if (parameters.logicalModel !== undefined) {
-        // this is to mantain the aliasing
-        this.logicalModel = parameters.logicalModel;
+    if (parameters.jsonGraphics !== undefined) {
+        // this is to mantain the aliasing broken by the $.extend() method
+        this.jsonGraphics = parameters.jsonGraphics;
+    } else if (this.is_top) {
+        // only top model can creates a new JSONModelGraphics if it isn't there.
+        this.jsonGraphics = new JSONModelGraphics({ id: this.id });
     } else {
-        this.logicalModel = new LogicalModel({
-            id: this.id,
-            structure: parameters.structure || {},
-            graphics: parameters.graphics || {},
-        });
+        console.error("[Model] initialize: model is not top and there is no specified JSONModelGraphics.");
     }
 
     /*********** graphical custom components ***********/
@@ -248,7 +247,7 @@ Model.prototype.expand = function() {
                 canvas: this.canvas,
                 width: modelsWidth,
                 height: modelsHeight,
-                logicalModel: this.logicalModel.get_submodel(columnMoldes[i]),
+                jsonGraphics: this.jsonGraphics.get_submodel(columnMoldes[i]),
                 structure: $.extend(true, {}, modelStructure)
             });
             model.x = x;
@@ -282,9 +281,9 @@ Model.prototype.draw_ic = function(ics) {
         from_port = this.getPort(ic.from_model, ic.from_port, Port.out);
         to_port = this.getPort(ic.to_model, ic.to_port, Port.in);
         
-        nodes = this.logicalModel.get_ic_nodes(ic);
+        nodes = this.jsonGraphics.get_ic_nodes(ic);
         link = this.connect(from_port, to_port, ic, Link.Kind.IC, nodes);
-        nodes = this.logicalModel.save_ic_nodes(ic, link.nodes);
+        nodes = this.jsonGraphics.save_ic_nodes(ic, link.nodes);
         this.ic.push(link);
     }
 
@@ -300,9 +299,9 @@ Model.prototype.draw_eic = function(eics) {
         from_port = this.getPort(this.id, eic.from_port, Port.in);
         to_port = this.getPort(eic.to_model, eic.to_port, Port.in);
 
-        nodes = this.logicalModel.get_eic_nodes(eic);
+        nodes = this.jsonGraphics.get_eic_nodes(eic);
         link = this.connect(from_port, to_port, eic, Link.Kind.EIC, nodes);
-        nodes = this.logicalModel.save_eic_nodes(eic, link.nodes);
+        nodes = this.jsonGraphics.save_eic_nodes(eic, link.nodes);
         this.eic.push(link);
     }
 
@@ -318,9 +317,9 @@ Model.prototype.draw_eoc = function(eocs) {
         from_port = this.getPort(eoc.from_model, eoc.from_port, Port.out);
         to_port = this.getPort(this.id, eoc.to_port, Port.out);
         
-        nodes = this.logicalModel.get_eoc_nodes(eoc);
+        nodes = this.jsonGraphics.get_eoc_nodes(eoc);
         link = this.connect(from_port, to_port, eoc, Link.Kind.EOC, nodes);
-        nodes = this.logicalModel.save_eoc_nodes(eoc, link.nodes);
+        nodes = this.jsonGraphics.save_eoc_nodes(eoc, link.nodes);
         this.eoc.push(link);
     }
 
