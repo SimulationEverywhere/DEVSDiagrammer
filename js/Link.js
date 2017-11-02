@@ -32,13 +32,20 @@ Link.Kind = { IC: "IC", EIC: "EIC", EOC: "EOC" };
  * @param {Canvas} parameters.canvas - The canvas where the link belongs to update the stage.
  * @param {String} parameters.color - The link colo in RGB format.
  * @param {Number} parameters.width - The link width in pixels.
+ * @param {Boolean} parameters.scale_nodes - Indicates to the constructor that the node positions comes from a different scale and must be scaled.
  */
 Link.prototype.initialize = function(parameters) {
     
     this.ShapeInitialize();
     $.extend(true, this, parameters);
 
-    this.scale_node_positions();
+    if (parameters.scale_nodes) {
+        this.scale_node_positions();
+    }
+
+    // Replace first and last nodes
+    this.nodes.splice(0, 1, this.start_point);
+    this.nodes.splice(this.nodes.length - 1, 1, this.end_point);
 
     this.holded = false;
     this.node_epsilon = manifest.link.node_epsilon;
@@ -128,10 +135,6 @@ Link.prototype.scale_node_positions = function() {
         this.nodes[i].x = this.nodes[i].x * scale;
         this.nodes[i].y = this.nodes[i].y * scale;
     }
-
-    // Replace first and last nodes
-    this.nodes.splice(0, 1, this.start_point);
-    this.nodes.splice(this.nodes.length - 1, 1, this.end_point);
 };
 
 /********* Drag & drop ******************/

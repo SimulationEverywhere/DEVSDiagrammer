@@ -283,7 +283,7 @@ Model.prototype.draw_ic = function(ics) {
         
         nodes = this.jsonGraphics.get_ic_nodes(ic);
         link = this.connect(from_port, to_port, ic, Link.Kind.IC, nodes);
-        nodes = this.jsonGraphics.save_ic_nodes(ic, link.nodes);
+        this.jsonGraphics.save_ic_nodes(ic, link.nodes);
         this.ic.push(link);
     }
 
@@ -301,7 +301,7 @@ Model.prototype.draw_eic = function(eics) {
 
         nodes = this.jsonGraphics.get_eic_nodes(eic);
         link = this.connect(from_port, to_port, eic, Link.Kind.EIC, nodes);
-        nodes = this.jsonGraphics.save_eic_nodes(eic, link.nodes);
+        this.jsonGraphics.save_eic_nodes(eic, link.nodes);
         this.eic.push(link);
     }
 
@@ -319,14 +319,14 @@ Model.prototype.draw_eoc = function(eocs) {
         
         nodes = this.jsonGraphics.get_eoc_nodes(eoc);
         link = this.connect(from_port, to_port, eoc, Link.Kind.EOC, nodes);
-        nodes = this.jsonGraphics.save_eoc_nodes(eoc, link.nodes);
+        this.jsonGraphics.save_eoc_nodes(eoc, link.nodes);
         this.eoc.push(link);
     }
 
     this.canvas.stage.update();
 };
 
-Model.prototype.connect = function(from_port, to_port, information, kind, nodes) {
+Model.prototype.connect = function(from_port, to_port, information, kind, nodes, scale_nodes) {
     var start_point, end_point, link;
     start_point = from_port.parent.localToLocal(from_port.x + from_port.width - from_port.regX,
                                                 from_port.y - from_port.regY + from_port.height / 2,
@@ -334,10 +334,16 @@ Model.prototype.connect = function(from_port, to_port, information, kind, nodes)
     end_point = to_port.parent.localToLocal(to_port.x - to_port.regX,
                                             to_port.y - to_port.regY + to_port.height / 2,
                                             this);
+    
+    if (scale_nodes === undefined) {
+        scale_nodes = true;
+    }
+
     link = new Link({
         canvas: this.canvas,
         kind: kind,
         information: information,
+        scale_nodes: scale_nodes,
         from_port: from_port,
         to_port: to_port,
         start_point: start_point,
@@ -426,7 +432,7 @@ Model.prototype.show_submodel_links = function(submodel) {
 };
 
 Model.prototype.update_submodel_link = function(submodel) {
-    var i, from_port, to_port, submodel_ports_in, submodel_ports_out;
+    var i, from_port, to_port, submodel_ports_in, submodel_ports_out, information, nodes, link;
 
     submodel_ports_in = submodel.ports.in.map(function(p) { return p.id; });
     submodel_ports_out = submodel.ports.out.map(function(p) { return p.id; });
@@ -436,9 +442,15 @@ Model.prototype.update_submodel_link = function(submodel) {
         if (submodel_ports_in.indexOf(this.eic[i].to_port)) {
             from_port = this.eic[i].from_port;
             to_port = this.eic[i].to_port;
+            information = this.eic[i].information;
+            nodes = this.eic[i].nodes;
+
             this.removeChild(this.eic[i]);
             this.eic.splice(i, 1);
-            this.eic.push(this.connect(from_port, to_port));
+            
+            link = this.connect(from_port, to_port, information, Link.Kind.EIC, nodes, false);
+            this.jsonGraphics.save_eic_nodes(information, link.nodes);
+            this.eic.push(link);
         }
     }
 
@@ -446,9 +458,15 @@ Model.prototype.update_submodel_link = function(submodel) {
         if (submodel_ports_out.indexOf(this.eoc[i].from_port)) {
             from_port = this.eoc[i].from_port;
             to_port = this.eoc[i].to_port;
+            information = this.eoc[i].information;
+            nodes = this.eoc[i].nodes;
+            
             this.removeChild(this.eoc[i]);
             this.eoc.splice(i, 1);
-            this.eoc.push(this.connect(from_port, to_port));
+            
+            link = this.connect(from_port, to_port, information, Link.Kind.EOC, nodes, false);
+            this.jsonGraphics.save_eoc_nodes(information, link.nodes);
+            this.eoc.push(link);
         }
     }
 
@@ -456,9 +474,15 @@ Model.prototype.update_submodel_link = function(submodel) {
         if (submodel_ports_in.indexOf(this.ic[i].to_port) || submodel_ports_out.indexOf(this.ic[i].from_port)) {
             from_port = this.ic[i].from_port;
             to_port = this.ic[i].to_port;
+            information = this.ic[i].information;
+            nodes = this.ic[i].nodes;
+            
             this.removeChild(this.ic[i]);
             this.ic.splice(i, 1);
-            this.ic.push(this.connect(from_port, to_port));
+            
+            link = this.connect(from_port, to_port, information, Link.Kind.IC, nodes, false);
+            this.jsonGraphics.save_ic_nodes(information, link.nodes);
+            this.ic.push(link);
         }
     }
 
