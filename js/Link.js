@@ -1,4 +1,4 @@
-/*global createjs, $, manifest */
+/*global createjs, $, manifest, console */
 /*exported Link*/
 "use strict";
 
@@ -149,6 +149,7 @@ Link.prototype.hold = function(evt) {
     evt.stopImmediatePropagation();
 
     if (!this.holded) {
+        this.parent.dragged_child = true;
         this.holded = true;
 
         local_position = this.globalToLocal(evt.stageX, evt.stageY);
@@ -164,6 +165,8 @@ Link.prototype.hold = function(evt) {
 
 Link.prototype.move = function(evt) {
     evt.stopImmediatePropagation();
+    evt.stopPropagation();
+
     if (this.holded) {
         this.update_position(evt);
     }
@@ -171,8 +174,11 @@ Link.prototype.move = function(evt) {
 
 Link.prototype.release = function(evt) {
     evt.stopImmediatePropagation();
+    evt.stopPropagation();
 
+    console.log("Object: link - release");
     if(this.holded) {
+        this.parent.dragged_child = false;
         this.holded = false;
         this.merge_nodes();
         this.update_position(evt);

@@ -34,7 +34,6 @@ Model.prototype.initialize = function(parameters) {
 
     /********* logical components **********/
     this.is_top = false;
-    this.is_expanded = false;
     this.shows_port_names = options.show_port_name;
     this.structure = $.extend(true, {}, Model.empty_structure);
 
@@ -46,6 +45,8 @@ Model.prototype.initialize = function(parameters) {
     this.eic = [];
 
     /************ status values *************/
+    this.is_expanded = false;
+    this.dragged_child = false;
     this.selected = false;
 
     /********** Default values **************/
@@ -566,7 +567,7 @@ Model.prototype.distance = function(a, b) {
 Model.prototype.select = function(evt) {
     evt.stopImmediatePropagation();
 
-    if (this.dragged) { return; }
+    if (this.dragged || this.dragged_child) { return; }
     console.log("ID:", this.id, "Select");
 
     this.is_selected = !this.is_selected;
@@ -592,9 +593,12 @@ Model.prototype.select = function(evt) {
 Model.prototype.hold = function(evt) {
     evt.stopImmediatePropagation();
     
-    if (!this.holding && !this.is_top) {
+    if (!this.holding && !this.is_top && !this.dragged_child) {
+
         console.log("ID:", this.id, "hold");
+        this.parent.dragged_child = true;
         this.holding = true;
+        
         this.mouse_offset = this.parent.globalToLocal(evt.stageX, evt.stageY);
         this.mouse_offset.x -= this.x;
         this.mouse_offset.y -= this.y;
@@ -616,9 +620,13 @@ Model.prototype.move = function(evt) {
 Model.prototype.release = function(evt) {
     evt.stopImmediatePropagation();
     
-    console.log("ID: ", this.id, "release");
-    this.holding = false;
-    this.update_position(evt);
+    if (this.holding) {
+        console.log("ID: ", this.id, "release");
+        this.parent.dragged_child = false;
+        this.holding = false;
+        
+        this.update_position(evt);
+    }
 };
 
 Model.prototype.update_position = function (evt) {
