@@ -38,8 +38,7 @@ Link.prototype.initialize = function(parameters) {
     this.ShapeInitialize();
     $.extend(true, this, parameters);
 
-    this.nodes.splice(0, 1, this.start_point);
-    this.nodes.splice(this.nodes.length - 1, 1, this.end_point);
+    this.scale_node_positions();
 
     this.holded = false;
     this.node_epsilon = manifest.link.node_epsilon;
@@ -114,6 +113,25 @@ Link.prototype.get_new_node_index = function(node) {
             return i;
         }
     }
+};
+
+Link.prototype.scale_node_positions = function() {
+    var new_horizontal_distance, current_horizontal_distance, scale, i;
+
+    current_horizontal_distance = Math.abs(this.nodes[0].x - this.nodes[this.nodes.length - 1].x);
+    new_horizontal_distance = Math.abs(this.start_point.x - this.end_point.x);
+    
+    scale = new_horizontal_distance / current_horizontal_distance;
+
+    // First and last nodes are replaced instead of being scaled
+    for(i = 1; i < this.nodes.length - 1; i++) {
+        this.nodes[i].x = this.nodes[i].x * scale;
+        this.nodes[i].y = this.nodes[i].y * scale;
+    }
+
+    // Replace first and last nodes
+    this.nodes.splice(0, 1, this.start_point);
+    this.nodes.splice(this.nodes.length - 1, 1, this.end_point);
 };
 
 /********* Drag & drop ******************/
