@@ -1,5 +1,5 @@
-/*global console, createjs, $, Square, Port, Line, relaxed_khan, selected_models,
-         manifest, options, sort_ports */
+/*global console, createjs, $, Square, Port, Link, relaxed_khan, selected_models,
+         manifest, options, sort_ports, LogicalModel */
 /*exported Model */
 
 "use strict";
@@ -32,13 +32,13 @@ Model.prototype.initialize = function(parameters) {
     this.ContainerInitialize();
 
 
-    /********** Model structure ************/
+    /********* logical components **********/
     this.is_top = false;
     this.is_expanded = false;
     this.shows_port_names = options.show_port_name;
     this.structure = $.extend(true, {}, Model.empty_structure);
 
-    /******* graphical components **********/
+    /******* graphical default components **********/
     this.ports = {in: [], out: []};
     this.models = [];
     this.ic = [];
@@ -52,10 +52,25 @@ Model.prototype.initialize = function(parameters) {
     this.textColor = "#000000";
     this.radius_percentage = 0.05;
 
+    /********* custom values ****************/
     $.extend(true, this, parameters);
-
     this.id = this.structure.id;
+    
 
+    /********** logical model ***************/
+
+    if (parameters.logicalModel !== undefined) {
+        // this is to mantain the aliasing
+        this.logicalModel = parameters.logicalModel;
+    } else {
+        this.logicalModel = new LogicalModel({
+            id: this.id,
+            structure: parameters.structure || {},
+            graphics: parameters.graphics || {},
+        });
+    }
+
+    /*********** graphical custom components ***********/
     if (this.is_top) {
         this.width = this.canvas.stageWidth * 0.85;
         this.height = this.canvas.stageHeight * 0.85;
@@ -128,13 +143,13 @@ Model.prototype.draw_ports = function() {
     this.clean(this.ports.in);
     this.clean(this.ports.out);
 
-    this.add_ports(this.structure.ports.in, this.ports.in, 0);
-    this.add_ports(this.structure.ports.out, this.ports.out, this.width);
+    this.add_ports(this.structure.ports.in, this.ports.in, 0, Port.in);
+    this.add_ports(this.structure.ports.out, this.ports.out, this.width, Port.out);
 
     this.canvas.stage.update();
 };
 
-Model.prototype.add_ports = function(structure_ports, graphical_ports, x) {
+Model.prototype.add_ports = function(structure_ports, graphical_ports, x, kind) {
     var i, height, port, margin, sorted_structure_ports;
 
     this.clean(graphical_ports);
@@ -151,6 +166,7 @@ Model.prototype.add_ports = function(structure_ports, graphical_ports, x) {
             canvas: this.canvas,
             fillColor: "#FFFFFF",
             height: height,
+            kind: kind,
             id: sorted_structure_ports[i].name,
             message_type: sorted_structure_ports[i].message_type,
             font_size: height * 0.4
@@ -232,7 +248,8 @@ Model.prototype.expand = function() {
                 canvas: this.canvas,
                 width: modelsWidth,
                 height: modelsHeight,
-                structure: $.extend(true, {}, modelStructure) 
+                logicalModel: this.logicalModel.get_submodel(columnMoldes[i]),
+                structure: $.extend(true, {}, modelStructure)
             });
             model.x = x;
             model.y = modelVerticalSpace / 2 + i * modelVerticalSpace;
@@ -257,77 +274,90 @@ Model.prototype.draw_links = function() {
 };
 
 Model.prototype.draw_ic = function(ics) {
-    var port_in, port_out, ic, i;
+    var nodes, to_port, from_port, link, ic, i;
 
     for (i = 0; i < ics.length; i++) {
         ic = ics[i];
 
-        port_out = this.getPort(ic.from_model, ic.from_port, Port.out);
-        port_in = this.getPort(ic.to_model, ic.to_port, Port.in);
+        from_port = this.getPort(ic.from_model, ic.from_port, Port.out);
+        to_port = this.getPort(ic.to_model, ic.to_port, Port.in);
         
-        this.ic.push(this.connect(port_out, port_in));
+        nodes = this.logicalModel.get_ic_nodes(ic);
+        link = this.connect(from_port, to_port, ic, Link.Kind.IC, nodes);
+        nodes = this.logicalModel.save_ic_nodes(ic, link.nodes);
+        this.ic.push(link);
     }
 
     this.canvas.stage.update();
 };
 
 Model.prototype.draw_eic = function(eics) {
-    var port_in, port_out, eic, i;
+    var to_port, from_port, link, nodes, eic, i;
 
     for (i = 0; i < eics.length; i++) {
         eic = eics[i];
 
-        port_out = this.getPort(this.id, eic.from_port, Port.in);
-        port_in = this.getPort(eic.to_model, eic.to_port, Port.in);
-        
-        this.eic.push(this.connect(port_out, port_in));
+        from_port = this.getPort(this.id, eic.from_port, Port.in);
+        to_port = this.getPort(eic.to_model, eic.to_port, Port.in);
+
+        nodes = this.logicalModel.get_eic_nodes(eic);
+        link = this.connect(from_port, to_port, eic, Link.Kind.EIC, nodes);
+        nodes = this.logicalModel.save_eic_nodes(eic, link.nodes);
+        this.eic.push(link);
     }
 
     this.canvas.stage.update();
 };
 
 Model.prototype.draw_eoc = function(eocs) {
-    var port_in, port_out, eoc, i;
+    var to_port, from_port, link, nodes, eoc, i;
 
     for (i = 0; i < eocs.length; i++) {
         eoc = eocs[i];
 
-        port_out = this.getPort(eoc.from_model, eoc.from_port, Port.out);
-        port_in = this.getPort(this.id, eoc.to_port, Port.out);
+        from_port = this.getPort(eoc.from_model, eoc.from_port, Port.out);
+        to_port = this.getPort(this.id, eoc.to_port, Port.out);
         
-        this.eoc.push(this.connect(port_out, port_in));
+        nodes = this.logicalModel.get_eoc_nodes(eoc);
+        link = this.connect(from_port, to_port, eoc, Link.Kind.EOC, nodes);
+        nodes = this.logicalModel.save_eoc_nodes(eoc, link.nodes);
+        this.eoc.push(link);
     }
 
     this.canvas.stage.update();
 };
 
-Model.prototype.connect = function(port_out, port_in) {
-    var start_point, end_point, line;
-    start_point = port_out.parent.localToLocal( port_out.x + port_out.width - port_out.regX,
-                                                port_out.y - port_out.regY + port_out.height / 2,
+Model.prototype.connect = function(from_port, to_port, information, kind, nodes) {
+    var start_point, end_point, link;
+    start_point = from_port.parent.localToLocal(from_port.x + from_port.width - from_port.regX,
+                                                from_port.y - from_port.regY + from_port.height / 2,
                                                 this);
-    end_point = port_in.parent.localToLocal(port_in.x - port_in.regX,
-                                            port_in.y - port_in.regY + port_in.height / 2,
+    end_point = to_port.parent.localToLocal(to_port.x - to_port.regX,
+                                            to_port.y - to_port.regY + to_port.height / 2,
                                             this);
-    line = new Line({
+    link = new Link({
         canvas: this.canvas,
-        port_out: port_out,
-        port_in: port_in,
-        nodes: [start_point, end_point],
+        kind: kind,
+        information: information,
+        from_port: from_port,
+        to_port: to_port,
+        start_point: start_point,
+        end_point: end_point,
+        nodes: nodes || [start_point, end_point],
         color: "#000000",
         width: 2,
     });
 
-    this.addChild(line);
-    return line;
+    this.addChild(link);
+    return link;
 };
 
-Model.prototype.getPort = function(model_id, port_id, inout) {
+Model.prototype.getPort = function(model_id, port_id, kind) {
     var model, ports, i;
 
     model = this.getModel(model_id);
 
-    if (inout == Port.in) {
+    if (kind == Port.in) {
         ports = model.ports.in;
     } else {
         ports = model.ports.out;
@@ -397,39 +427,39 @@ Model.prototype.show_submodel_links = function(submodel) {
 };
 
 Model.prototype.update_submodel_link = function(submodel) {
-    var i, port_out, port_in, submodel_ports_in, submodel_ports_out;
+    var i, from_port, to_port, submodel_ports_in, submodel_ports_out;
 
     submodel_ports_in = submodel.ports.in.map(function(p) { return p.id; });
     submodel_ports_out = submodel.ports.out.map(function(p) { return p.id; });
     
 
     for (i = 0; i < this.eic.length; i++) {
-        if (submodel_ports_in.indexOf(this.eic[i].port_in)) {
-            port_out = this.eic[i].port_out;
-            port_in = this.eic[i].port_in;
+        if (submodel_ports_in.indexOf(this.eic[i].to_port)) {
+            from_port = this.eic[i].from_port;
+            to_port = this.eic[i].to_port;
             this.removeChild(this.eic[i]);
             this.eic.splice(i, 1);
-            this.eic.push(this.connect(port_out, port_in));
+            this.eic.push(this.connect(from_port, to_port));
         }
     }
 
     for (i = 0; i < this.eoc.length; i++) {
-        if (submodel_ports_out.indexOf(this.eoc[i].port_out)) {
-            port_out = this.eoc[i].port_out;
-            port_in = this.eoc[i].port_in;
+        if (submodel_ports_out.indexOf(this.eoc[i].from_port)) {
+            from_port = this.eoc[i].from_port;
+            to_port = this.eoc[i].to_port;
             this.removeChild(this.eoc[i]);
             this.eoc.splice(i, 1);
-            this.eoc.push(this.connect(port_out, port_in));
+            this.eoc.push(this.connect(from_port, to_port));
         }
     }
 
     for (i = 0; i < this.ic.length; i++) {
-        if (submodel_ports_in.indexOf(this.ic[i].port_in) || submodel_ports_out.indexOf(this.ic[i].port_out)) {
-            port_out = this.ic[i].port_out;
-            port_in = this.ic[i].port_in;
+        if (submodel_ports_in.indexOf(this.ic[i].to_port) || submodel_ports_out.indexOf(this.ic[i].from_port)) {
+            from_port = this.ic[i].from_port;
+            to_port = this.ic[i].to_port;
             this.removeChild(this.ic[i]);
             this.ic.splice(i, 1);
-            this.ic.push(this.connect(port_out, port_in));
+            this.ic.push(this.connect(from_port, to_port));
         }
     }
 

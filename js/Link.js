@@ -1,38 +1,45 @@
-/*global createjs, $ */
-/*exported Line*/
+/*global createjs, $, manifest */
+/*exported Link*/
 "use strict";
 
 /**
- * @class Line
+ * @class Link
  * @author Laouen Mayal Louan Belloli
  * 
- * @description Displays a graphical vectorized lines represented by a list of nodes in its local 
+ * @description Displays a graphical vectorized links represented by a list of nodes in its local 
  * reference space. Each node can be dragged to a new position, and new nodes can be created by 
- * dragging a point witin the line. The new node is placed in between the two adjacents nodes of the
- * line containing the selected point.
+ * dragging a point witin the link. The new node is placed in between the two adjacents nodes of the
+ * link containing the selected point.
  */
 
-function Line(parameters) {
+function Link(parameters) {
     /*jshint validthis:true */
     this.initialize(parameters);
 }
 
-Line.prototype = new createjs.Shape();
-Line.prototype.ShapeInitialize = Line.prototype.initialize;
-Line.prototype.ContainerTick = Line.prototype._tick;
+Link.prototype = new createjs.Shape();
+Link.prototype.ShapeInitialize = Link.prototype.initialize;
+Link.prototype.ContainerTick = Link.prototype._tick;
+
+Link.Kind = { IC: "IC", EIC: "EIC", EOC: "EOC" };
 
 /**
- * Construct a new Line instance
+ * Construct a new Link instance
  * @param  {Object} parameters - all the required parameters to construct a new instance.
+ * @param {Object} parameters.start_point - the current start point where the link starts.
+ * @param {Object} parameters.end_point - the current end point where the link ends.
  * @param {[Object]} parameters.nodes - the sorted list of nodes, a node is an object with attributes x and y.
- * @param {Canvas} parameters.canvas - The canvas where the line belongs to update the stage.
- * @param {String} parameters.color - The line colo in RGB format.
- * @param {Number} parameters.width - The line width in pixels.
+ * @param {Canvas} parameters.canvas - The canvas where the link belongs to update the stage.
+ * @param {String} parameters.color - The link colo in RGB format.
+ * @param {Number} parameters.width - The link width in pixels.
  */
-Line.prototype.initialize = function(parameters) {
+Link.prototype.initialize = function(parameters) {
     
     this.ShapeInitialize();
     $.extend(true, this, parameters);
+
+    this.nodes.splice(0, 1, this.start_point);
+    this.nodes.splice(this.nodes.length - 1, 1, this.end_point);
 
     this.holded = false;
     this.node_epsilon = manifest.link.node_epsilon;
@@ -47,17 +54,17 @@ Line.prototype.initialize = function(parameters) {
     this.addEventListener("pressup", this.release.bind(this));
 };
 
-Line.prototype.update = function() {
+Link.prototype.update = function() {
 
     this.graphics = new createjs.Graphics();
-    this.draw_line(this.graphics, this.width);
+    this.draw_link(this.graphics, this.width);
     this.hitArea = new createjs.Shape();
     this.hitArea.graphics = new createjs.Graphics();
-    this.draw_line(this.hitArea.graphics, this.width + this.margin);
+    this.draw_link(this.hitArea.graphics, this.width + this.margin);
     this.canvas.stage.update();
 };
 
-Line.prototype.draw_line = function(graphic, width) {
+Link.prototype.draw_link = function(graphic, width) {
     var i;
 
     graphic.setStrokeStyle(width);
@@ -69,11 +76,11 @@ Line.prototype.draw_line = function(graphic, width) {
     }
 };
 
-Line.prototype.check_min_values = function() {
+Link.prototype.check_min_values = function() {
     this.width = Math.max(this.width, 1);
 };
 
-Line.prototype.get_node = function(evt) {
+Link.prototype.get_node = function(evt) {
     var i;
 
     for(i = 0; i < this.nodes.length; ++i) {
@@ -86,20 +93,20 @@ Line.prototype.get_node = function(evt) {
     return null;
 };
 
-Line.prototype.distance = function(a, b) {
+Link.prototype.distance = function(a, b) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 };
 
-Line.prototype.is_over_node = function (node, evt) {
+Link.prototype.is_over_node = function (node, evt) {
     return this.distance(evt, node) < this.margin + this.node_epsilon;
 };
 
-Line.prototype.is_between = function(a, b, c) {
+Link.prototype.is_between = function(a, b, c) {
     var distanceByC = this.distance(a, c) + this.distance(c, b);
     return Math.abs(distanceByC - this.distance(a, b)) < this.margin + this.epsilon;
 };
 
-Line.prototype.get_new_node_index = function(node) {
+Link.prototype.get_new_node_index = function(node) {
     var i;
 
     for (i = 1; i < this.nodes.length; i++) {
@@ -111,8 +118,8 @@ Line.prototype.get_new_node_index = function(node) {
 
 /********* Drag & drop ******************/
 
-Line.prototype.hold = function(evt) {
-    var local_position, node, index;
+Link.prototype.hold = function(evt) {
+    var local_position, node;
     evt.stopImmediatePropagation();
 
     if (!this.holded) {
@@ -122,41 +129,39 @@ Line.prototype.hold = function(evt) {
         node = this.get_node(local_position);
         
         if (node !== null) {
-
             this.holded_node = node;
         } else {
-
-            this.holded_node = local_position;
-            index = this.get_new_node_index(this.holded_node);
-            this.nodes.splice(index, 0, this.holded_node);
+            this.create_node(local_position);
         }
     }
 };
 
-Line.prototype.move = function(evt) {
+Link.prototype.move = function(evt) {
     evt.stopImmediatePropagation();
     if (this.holded) {
         this.update_position(evt);
     }
 };
 
-Line.prototype.release = function(evt) {
+Link.prototype.release = function(evt) {
     evt.stopImmediatePropagation();
+
     if(this.holded) {
         this.holded = false;
         this.merge_nodes();
         this.update_position(evt);
+        this.parent.logicalModel.update_link_nodes(this.kind, this.information, this.nodes);
     }
 };
 
-Line.prototype.update_position = function(evt) {
+Link.prototype.update_position = function(evt) {
     var local_position = this.globalToLocal(evt.stageX, evt.stageY);
     this.holded_node.x = local_position.x;
     this.holded_node.y = local_position.y;
     this.update();
 };
 
-Line.prototype.merge_nodes = function() {
+Link.prototype.merge_nodes = function() {
     var i = 1;
     while (i < this.nodes.length) {
         if (this.distance(this.nodes[i - 1], this.nodes[i]) < this.node_epsilon + this.margin) {
@@ -165,4 +170,14 @@ Line.prototype.merge_nodes = function() {
             i++;
         }
     }
+};
+
+Link.prototype.create_node = function(local_position) {
+    var index;
+
+    this.holded_node = local_position;
+    index = this.get_new_node_index(this.holded_node);
+    this.nodes.splice(index, 0, this.holded_node);
+
+    this.parent.logicalModel.add_node_to_link(this.kind, this.information, this.holded_node, index);
 };
