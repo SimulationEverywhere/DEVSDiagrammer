@@ -86,10 +86,15 @@ Link.prototype.check_min_values = function() {
     this.width = Math.max(this.width, 1);
 };
 
+/**
+ * Warning: it does not return the first and last nodes because they can't  be dragged.
+ * @param  {Object} evt - The mouse event.
+ * @return {Object}     The node under the mouse.
+ */
 Link.prototype.get_node = function(evt) {
     var i;
 
-    for(i = 0; i < this.nodes.length; ++i) {
+    for(i = 1; i < this.nodes.length - 1; ++i) {
         
         if (this.is_over_node(this.nodes[i], evt)) {
             return this.nodes[i];
