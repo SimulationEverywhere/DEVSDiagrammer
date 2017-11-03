@@ -1,4 +1,4 @@
-# DEVSDiagramer [![Build Status](https://travis-ci.org/sdavtaker/DEVSDiagrammer.svg?branch=master)](https://travis-ci.org/sdavtaker/DEVSDiagrammer)
+# DEVSDiagramer [![Build Status](https://travis-ci.org/Laouen/DEVSDiagrammer.svg?branch=master)](https://travis-ci.org/Laouen/DEVSDiagrammer)
 Reads DEVS coupled model structures as JSON and displays an interactive diagram model
 
 # Dependencies
