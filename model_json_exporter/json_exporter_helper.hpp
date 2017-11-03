@@ -79,7 +79,7 @@ void IC_to_json(ptree &json_model) {
     if (!json_IC_list.empty()) {
         json_model.add_child("ic", json_IC_list);
     }
-};
+}
 
 /*******************************************************/
 /**************** EIC export to json ********************/
@@ -118,7 +118,7 @@ void EIC_to_json(ptree &json_model) {
     if (!json_EIC_list.empty()) {
         json_model.add_child("eic", json_EIC_list);
     }
-};
+}
 
 /*******************************************************/
 /**************** EOC export to json ********************/
@@ -158,7 +158,7 @@ void EOC_to_json(ptree &json_model) {
     if (!json_EOC_list.empty()) {
         json_model.add_child("eoc", json_EOC_list);
     }
-};
+}
 
 /*******************************************************/
 /*************** ports export to json ******************/
@@ -205,7 +205,7 @@ void ports_to_json(ptree &json_model, cadmium::port_kind outin) {
             json_model.add_child("in", json_ports_list);
         }
     }
-};
+}
 
 /*******************************************************/
 /************* submodels export to json ****************/
@@ -244,7 +244,7 @@ void submodels_to_json(ptree &json_model) {
     if (!json_submodels_list.empty()) {
         json_model.add_child("models", json_submodels_list);
     }
-};
+}
 
 /*******************************************************/
 /******* submodels with depth export to json ***********/
@@ -292,6 +292,6 @@ void submodels_to_json(ptree &json_model, int depth) {
     if (!json_submodels_list.empty()) {
         json_model.add_child("models", json_submodels_list);
     }
-};
+}
 
 #endif //PMGBP_PDEVS_TUPLE_PRINTER_HPP_HPP

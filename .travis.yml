@@ -10,4 +10,4 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install cmake || brew upgrade cmake || true; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install boost-build || brew upgrade cmake || true; fi
 script:
-  - git submodule update --recursive --remote && cd model_json_exporter && cmake -G "Unix Makefiles" . && make && make test  
+  - git submodule update -i --recursive --remote && cd model_json_exporter && cmake -G "Unix Makefiles" . && make && make test  

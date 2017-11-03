@@ -189,7 +189,7 @@ void export_model_to_json(const char* json_file_path) {
 
     json_exporter exporter;
     exporter.print_to_json(json_file_path);
-};
+}
 
 template<typename TIME, template<typename T> class MODEL>
 void export_model_to_json(const char* json_file_path, int depth) {
@@ -197,7 +197,7 @@ void export_model_to_json(const char* json_file_path, int depth) {
 
     json_exporter exporter;
     exporter.print_to_json(json_file_path, depth);
-};
+}
 
 
 #endif //PMGBP_PDEVS_MODEL_JSON_EXPORTER
