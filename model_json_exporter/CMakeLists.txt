@@ -16,6 +16,6 @@ foreach(testSrc ${TestSources})
         get_filename_component(testName ${testSrc} NAME_WE)
         add_executable(${testName} test/main-test.cpp ${testSrc})
         target_link_libraries(${testName} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-	add_test(${testName} ${testName})
+        add_test(${testName} ${testName})
 endforeach(testSrc)
 

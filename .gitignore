@@ -1,4 +1,5 @@
 #cmake generated files
+model_json_exporter/cmake-build-debug/
 model_json_exporter/CMakeCache.txt
 model_json_exporter/CMakeFiles/
 model_json_exporter/CMakeScripts/
@@ -10,3 +11,6 @@ model_json_exporter/cmake_install.cmake
 model_json_exporter/Makefile
 model_json_exporter/Testing/
 model_json_exporter/*_test
+
+# Clion files
+model_json_exporter/.idea

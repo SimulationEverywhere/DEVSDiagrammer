@@ -34,7 +34,7 @@
 #include <cadmium/basic_model/accumulator.hpp>
 #include <cadmium/modeling/coupled_model.hpp>
 #include <cadmium/engine/pdevs_runner.hpp>
-#include "../model_json_exporter.hpp"
+#include "../include/model_json_exporter.hpp"
 //
 /**
  * Checking that a known model generates the expected json output
