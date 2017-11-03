@@ -72,14 +72,25 @@ Model.prototype.initialize = function(parameters) {
 
     /*********** graphical custom components ***********/
     if (this.is_top) {
-        this.width = this.canvas.stageWidth * 0.85;
-        this.height = this.canvas.stageHeight * 0.85;
         this.x = this.canvas.stageWidth / 2;
         this.y = this.canvas.stageHeight / 2;
+        this.width = this.canvas.stageWidth * 0.85;
+        this.height = this.canvas.stageHeight * 0.85;
+        this.regX = this.width / 2;
+        this.regY = this.height / 2;
+    } else {
+        $.extend(true, this, this.jsonGraphics.json.model_box);
     }
 
-    this.regX = this.width / 2;
-    this.regY = this.height / 2;
+
+    this.jsonGraphics.update_model_box({
+        x: this.x, 
+        y: this.y, 
+        width: this.width,
+        height: this.height,
+        regX: this.regX,
+        regY:this.regY 
+    });
 
     this.draw_coupled();
 
@@ -213,7 +224,7 @@ Model.prototype.expand = function() {
         this.is_expanded) { return; }
 
     var modelsByColumns, highestColum, modelsWidth, modelsHeight, i, j, x;
-    var model, columnMoldes, modelStructure;
+    var model, columnMoldes, modelStructure, jsonGraphics;
 
     this.clean(this.models);
 
@@ -244,15 +255,24 @@ Model.prototype.expand = function() {
         for (i = 0; i < columnMoldes.length; i++) {
 
             modelStructure = this.get_model(columnMoldes[i]);
+            jsonGraphics = this.jsonGraphics.get_submodel(columnMoldes[i]);
+
+            if (jsonGraphics.json.model_box === undefined) {
+                jsonGraphics.update_model_box({
+                    x: x, 
+                    y: modelVerticalSpace / 2 + i * modelVerticalSpace, 
+                    width: modelsWidth,
+                    height: modelsHeight,
+                    regX: modelsWidth / 2,
+                    regY: modelsHeight / 2 
+                });
+            }
+
             model = new Model({
                 canvas: this.canvas,
-                width: modelsWidth,
-                height: modelsHeight,
-                jsonGraphics: this.jsonGraphics.get_submodel(columnMoldes[i]),
+                jsonGraphics: jsonGraphics,
                 structure: $.extend(true, {}, modelStructure)
             });
-            model.x = x;
-            model.y = modelVerticalSpace / 2 + i * modelVerticalSpace;
             this.addChild(model);
             this.models.push(model);
         }
@@ -634,6 +654,8 @@ Model.prototype.update_position = function (evt) {
     var mose_local_position = this.parent.globalToLocal(evt.stageX, evt.stageY);
     this.x = mose_local_position.x - this.mouse_offset.x;
     this.y = mose_local_position.y - this.mouse_offset.y;
+
+    this.jsonGraphics.update_model_box({x: this.x, y: this.y});
 
     if (!this.dragged && this.distance(this, this.original_position) > 1) {
         this.dragged = true;

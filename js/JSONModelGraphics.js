@@ -28,6 +28,14 @@ JSONModelGraphics.emptyJSONGraphics = {
     eic: []
 };
 
+JSONModelGraphics.prototype.update_model_box = function(model_box) {
+    if (this.json.model_box === undefined) {
+        this.json.model_box = {};
+    }
+
+    $.extend(true, this.json.model_box, model_box);
+};
+
 JSONModelGraphics.prototype.get_ic_nodes = function(ic) {
     var i;
     for(i = 0; i < this.json.ic.length; i++) {
