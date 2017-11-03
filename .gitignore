@@ -1,0 +1,9 @@
+#cmake generated files
+model_json_exporter/CMakeCache.txt
+model_json_exporter/CMakeFiles/
+model_json_exporter/CMakeScripts/
+model_json_exporter/CTestTestfile.cmake
+model_json_exporter/DEVSDiagrammer.build/
+model_json_exporter/DEVSDiagrammer.xcodeproj/
+model_json_exporter/Debug/
+model_json_exporter/cmake_install.cmake
