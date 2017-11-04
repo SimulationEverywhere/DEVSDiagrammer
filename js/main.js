@@ -81,6 +81,14 @@ function show_submodel_links_selected() {
 	}
 }
 
+function export_model_json_selected() {
+	
+	while (selected_models.length > 0) {
+		export_model_json(selected_models[0]);
+		selected_models[0].select(evt);
+	}
+}
+
 function toggle_selected() {
 	while (selected_models.length > 0) {
 		selected_models[0].toggle();
@@ -117,6 +125,7 @@ $(window).keydown(function (e) {
 		case 50: remove_links_selected(); break;
 		case 51: show_submodel_links_selected(); break;
 		case 52: toggle_port_name_selected(); break;
+		case 53: export_model_json_selected(); break;
 	}
 });
 
@@ -128,4 +137,16 @@ function update_options() {
 	options.show_port_name = $('input[name="show_port_name"]:checked').length > 0;
 	options.compress_in_left = $('input[name="compress_in_left"]:checked').length > 0;
 	options.sort_ports_by_name = $('input[name="sort_ports_by_name"]:checked').length > 0;
+}
+
+function export_model_json(model) {
+
+	var exportedJson = $.extend(true, {}, model.structure);
+	exportedJson.graphics = $.extend(true, {}, model.jsonGraphics.json);
+
+	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportedJson, undefined, 4));
+	var downloadLink = document.getElementById('downloadModelJSON');
+	downloadLink.setAttribute("href", dataStr);
+	downloadLink.setAttribute("download", model.id + ".json");
+	downloadLink.click();
 }

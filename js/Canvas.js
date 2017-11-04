@@ -47,6 +47,8 @@ function Canvas(parameters) {
 }
 
 Canvas.prototype.initialize = function(parameters) {
+    var graphics, structure, jsonGraphics;
+
     this.id = "stage_canvas_" + canvas_id.toString();
     this.canvas_id++;
     
@@ -60,14 +62,19 @@ Canvas.prototype.initialize = function(parameters) {
     this.stageWidth  = this.dom_canvas.width();
     this.stageHeight = this.dom_canvas.height();
 
-    var structure = parameters.structure;
+    structure = parameters.structure;
     if (structure === undefined || structure === null) {
         structure = JSON.parse($(parameters.structure_input_id).val());
+        graphics = structure.graphics;
+        delete structure.graphics;
     }
 
-    var jsonGraphics = parameters.jsonGraphics;
+    jsonGraphics = parameters.jsonGraphics;
     if (jsonGraphics === undefined || jsonGraphics === null) {
-        jsonGraphics = new JSONModelGraphics({ id: structure.id });
+        jsonGraphics = new JSONModelGraphics({
+            id: structure.id,
+            json: graphics
+        });
     }
     
     this.top_model = new Model({
