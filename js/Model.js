@@ -101,16 +101,28 @@ Model.prototype.initialize = function(parameters) {
 
     /*********** graphical custom components ***********/
     if (this.is_top) {
+        
         this.x = this.canvas.stageWidth / 2;
         this.y = this.canvas.stageHeight / 2;
         this.width = this.canvas.stageWidth * 0.85;
         this.height = this.canvas.stageHeight * 0.85;
         this.regX = this.width / 2;
         this.regY = this.height / 2;
-    } else {
-        $.extend(true, this, this.jsonGraphics.json.model_box);
-    }
 
+    } else {
+        
+        this.x = this.jsonGraphics.json.model_box.x;
+        this.y = this.jsonGraphics.json.model_box.y;
+        this.width = this.jsonGraphics.json.model_box.width;
+        this.height = this.jsonGraphics.json.model_box.height;
+        this.regX = this.jsonGraphics.json.model_box.regX;
+        this.regY = this.jsonGraphics.json.model_box.regY;
+
+    }
+    
+    if (this.parent_dimentions !== undefined) {
+        this.rescale_box();
+    }
 
     this.jsonGraphics.update_model_box({
         x: this.x, 
@@ -118,7 +130,8 @@ Model.prototype.initialize = function(parameters) {
         width: this.width,
         height: this.height,
         regX: this.regX,
-        regY:this.regY 
+        regY:this.regY,
+        parent_dimentions: $.extend(true, {}, this.parent_dimentions) // for future rescaling reference
     });
 
     this.draw_coupled();
@@ -293,14 +306,15 @@ Model.prototype.expand = function() {
                     width: modelsWidth,
                     height: modelsHeight,
                     regX: modelsWidth / 2,
-                    regY: modelsHeight / 2 
+                    regY: modelsHeight / 2, 
                 });
             }
 
             model = new Model({
                 canvas: this.canvas,
                 jsonGraphics: jsonGraphics,
-                structure: $.extend(true, {}, modelStructure)
+                structure: $.extend(true, {}, modelStructure),
+                parent_dimentions: {width: this.width, height: this.height}
             });
             this.addChild(model);
             this.models.push(model);
@@ -611,6 +625,24 @@ Model.prototype.distance = function(a, b) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 };
 
+Model.prototype.rescale_box = function() {
+    var scaleX, scaleY;
+
+    if (this.jsonGraphics.json.model_box.parent_dimentions !== undefined) {
+        scaleX = this.parent_dimentions.width / this.jsonGraphics.json.model_box.parent_dimentions.width;
+        scaleY = this.parent_dimentions.height / this.jsonGraphics.json.model_box.parent_dimentions.height;
+
+        this.width = this.width * scaleX;
+        this.x = this.x * scaleX;
+        
+        this.height = this.height * scaleY;
+        this.y = this.y * scaleY;
+
+        this.regX = this.width / 2;
+        this.regY = this.height / 2;
+    }
+};
+
 /*********** Drag & Drop *****************/
 
 Model.prototype.select = function(evt) {
@@ -684,7 +716,7 @@ Model.prototype.update_position = function (evt) {
     this.x = mose_local_position.x - this.mouse_offset.x;
     this.y = mose_local_position.y - this.mouse_offset.y;
 
-    this.jsonGraphics.update_model_box({x: this.x, y: this.y});
+    this.jsonGraphics.update_model_position(this.x, this.y);
 
     if (!this.dragged && this.distance(this, this.original_position) > 1) {
         this.dragged = true;

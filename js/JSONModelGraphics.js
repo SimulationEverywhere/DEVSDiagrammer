@@ -58,12 +58,18 @@ JSONModelGraphics.emptyJSONGraphics = {
 };
 
 JSONModelGraphics.prototype.update_model_box = function(model_box) {
+    this.json.model_box = {};
+    $.extend(true, this.json.model_box, model_box);
+};
+
+JSONModelGraphics.prototype.update_model_position = function(x, y) {
     if (this.json.model_box === undefined) {
         this.json.model_box = {};
     }
 
-    $.extend(true, this.json.model_box, model_box);
-};
+    this.json.model_box.x = x;
+    this.json.model_box.y = y;
+}
 
 JSONModelGraphics.prototype.get_ic_nodes = function(ic) {
     var i;
