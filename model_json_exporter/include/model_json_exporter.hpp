@@ -74,18 +74,15 @@ public:
         this->export_to_json(json_model);
     }
 
-    void print_to_json(const char* json_file_path) {
+    std::ostream& print_to_json(std::ostream& os) {
         ptree json_model;
         this->export_to_json(json_model);
 
-        std::ostringstream buf;
-        ofstream json_file;
-        json_file.open (json_file_path);
+        //std::ostringstream buf;
 
-        write_json (buf, json_model, true);
-        json_file << buf.str();
-
-        json_file.close();
+        write_json (os, json_model, true);
+        //os << buf.str();
+        return os;
     }
 
     // just to allow the method call with the depth without asking if is an atomic exporter
@@ -154,49 +151,43 @@ public:
         submodels_to_json<TIME, submodels_type, coupled_submodel_exporter, atomic_submodel_exporter>(json_model, depth);
     }
 
-    void print_to_json(const std::string& json_file_path) {
+    std::ostream& print_to_json(std::ostream& os) {
         ptree json_model;
         this->export_to_json(json_model);
 
-        std::ostringstream buf;
-        ofstream json_file;
-        json_file.open (json_file_path);
+        //std::ostringstream buf;
 
-        write_json (buf, json_model, true);
-        json_file << buf.str();
-
-        json_file.close();
+        write_json (os, json_model, true);
+        //os << buf.str();
+        return os;
     }
 
-    void print_to_json(const std::string& json_file_path, int depth) {
+    std::ostream& print_to_json(std::ostream& os, int depth) {
         ptree json_model;
         this->export_to_json(json_model, depth);
 
-        std::ostringstream buf;
-        ofstream json_file;
-        json_file.open (json_file_path);
+        //std::ostringstream buf;
 
-        write_json (buf, json_model, true);
-        json_file << buf.str();
-
-        json_file.close();
+        write_json (os, json_model, true);
+        //os << buf.str();
+        return os;
     }
 };
 
 template<typename TIME, template<typename T> class MODEL>
-void export_model_to_json(const char* json_file_path) {
+void export_model_to_json(std::ostream& os) {
     using json_exporter=typename std::conditional<cadmium::concept::is_atomic<MODEL>::value(), Atomic_cadmiun_to_json<TIME, MODEL>, Cadmium_to_JSON<TIME, MODEL>>::type;
 
     json_exporter exporter;
-    exporter.print_to_json(json_file_path);
+    exporter.print_to_json(os);
 }
 
 template<typename TIME, template<typename T> class MODEL>
-void export_model_to_json(const char* json_file_path, int depth) {
+void export_model_to_json(std::ostream& os, int depth) {
     using json_exporter=typename std::conditional<cadmium::concept::is_atomic<MODEL>::value(), Atomic_cadmiun_to_json<TIME, MODEL>, Cadmium_to_JSON<TIME, MODEL>>::type;
 
     json_exporter exporter;
-    exporter.print_to_json(json_file_path, depth);
+    exporter.print_to_json(os, depth);
 }
 
 

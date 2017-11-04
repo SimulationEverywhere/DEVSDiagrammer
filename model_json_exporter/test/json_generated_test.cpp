@@ -78,18 +78,19 @@ template<typename TIME>
 using coupled_generator=cadmium::modeling::coupled_model<TIME, iports, oports, submodels, eics, eocs, ics>;
 
 BOOST_AUTO_TEST_CASE( a_simple_model_test ){
-    char testfilename[] = "test.json";
+    char testfilename[] = "ecoupled_generator_test.obtained.json";
     //check there is not a file already with the name test.json
     FILE *file = fopen(testfilename, "r");
     BOOST_REQUIRE(file == NULL);
-    
+
     //transform the model to json
-    export_model_to_json<float, coupled_generator>(testfilename);
+    std::ofstream test_output(testfilename);
+    export_model_to_json<float, coupled_generator>(test_output);
     
     //check the file was created and is not empty
     ifstream ifs(testfilename);
     BOOST_REQUIRE(ifs.good());
-    
+
     std::string line;
     std::getline(ifs, line);
     BOOST_CHECK(line.length() > 0); //something was written
