@@ -51,7 +51,7 @@ function remove_selected_top_models() {
 		if (selected_models[0].is_top) {
 			selected_models[0].canvas.dom_canvas.remove();
 		}
-		selected_models[0].select(evt);		
+		selected_models[0].toggle_selection(evt);		
 	}
 }
 
@@ -59,7 +59,7 @@ function expand_in_new_canvas_selected() {
 	
 	while (selected_models.length > 0) {
 		new_model(selected_models[0].structure, selected_models[0].jsonGraphics.json);
-		selected_models[0].select(evt);
+		selected_models[0].toggle_selection(evt);
 	}
 }
 
@@ -67,7 +67,7 @@ function remove_links_selected() {
 	
 	while (selected_models.length > 0) {
 		selected_models[0].remove_links(false);
-		selected_models[0].select(evt);
+		selected_models[0].toggle_selection(evt);
 	}
 }
 
@@ -77,29 +77,31 @@ function show_submodel_links_selected() {
 		if (!selected_models[0].is_top) {
 			selected_models[0].parent.show_submodel_links(selected_models[0]);
 		}
-		selected_models[0].select(evt);
+		selected_models[0].toggle_selection(evt);
 	}
 }
 
 function export_model_json_selected() {
 	
 	while (selected_models.length > 0) {
-		export_model_json(selected_models[0]);
-		selected_models[0].select(evt);
+		if (!selected_models[0].is_top) {
+			export_model_json(selected_models[0]);
+		}
+		selected_models[0].toggle_selection(evt);
 	}
 }
 
 function toggle_selected() {
 	while (selected_models.length > 0) {
 		selected_models[0].toggle();
-		selected_models[0].select(evt);
+		selected_models[0].toggle_selection(evt);
 	}
 }
 
 function toggle_port_name_selected() {
 	while (selected_models.length > 0) {
 		selected_models[0].toggle_port_names();
-		selected_models[0].select(evt);
+		selected_models[0].toggle_selection(evt);
 	}
 }
 

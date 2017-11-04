@@ -138,7 +138,7 @@ Model.prototype.initialize = function(parameters) {
 
     if (this.is_top) this.expand();
 
-    this.addEventListener("click", this.select.bind(this));
+    this.addEventListener("click", this.toggle_selection.bind(this));
     this.addEventListener("mousedown", this.hold.bind(this));
     this.addEventListener("pressmove", this.move.bind(this));
     this.addEventListener("pressup", this.release.bind(this));
@@ -645,13 +645,14 @@ Model.prototype.rescale_box = function() {
 
 /*********** Drag & Drop *****************/
 
-Model.prototype.select = function(evt) {
+Model.prototype.toggle_selection = function(evt) {
     evt.stopImmediatePropagation();
 
     if (this.dragged || this.dragged_child) { return; }
     console.log("ID:", this.id, "Select");
 
     this.is_selected = !this.is_selected;
+    this.parent.dragged_child = false;
 
     if (this.is_selected) {
         selected_models.push(this);
