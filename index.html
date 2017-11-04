@@ -36,12 +36,12 @@
   <!-- hiden button for export JSON -->
 
   <div id="input_wrapper">
-    <label for="model_structure"><bold>Insert the DEVS model (JSON data)<bold></label>
+    <label for="model_structure"><h1>Insert the DEVS model (JSON data)<h1></label>
     <textarea id="model_structure" style="display: none"></textarea>
   </div>
   <div id="options_wrapper">
     <ul>
-      <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();"> Squared models</textarea></li>
+      <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();" checked> Squared models</textarea></li>
       <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> show port message types</textarea></li>
       <li><input type="checkbox" name="show_port_name" value="squared" onchange="update_options();" checked> show port name</textarea></li>
       <li><input type="checkbox" name="compress_in_left" value="squared" onchange="update_options();"> compress submodels in left</textarea></li>

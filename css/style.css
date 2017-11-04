@@ -1,13 +1,32 @@
+/* ======================== 
+          FONTS
+   ======================== */
+
+@font-face {
+    font-family: 'OpenSansLight';
+    src: url('../font/OpenSansLight.ttf')  format('truetype');
+}
+
 body {
 	color: #FFFFFF;
-  background-color: #426788;
+  background-color: #252525;
+  font-family: 'OpenSansLight', "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-align: center;
+}
+
+h1 {
+  color: #e8e8e8;
+  font-weight: normal;
+  font-size: 40px;
+  text-align: center;
+  line-height: 36px;
 }
 
 canvas {
   margin-top: 30px;
   background-color: #FFFFFF;
-  border-radius: 0px;
+  border-radius: 7px;
+  box-shadow: 0px 0px 8px 5px #0a0a0a;
 }
 
 button {
@@ -15,13 +34,6 @@ button {
   height: 60px;
   font-size: 20px;
   font-style: "bold";
-}
-
-label {
-  font-size: 30px;
-  display: block;
-  width: 100%;
-  text-align: left;
 }
 
 #input_wrapper {
@@ -43,8 +55,13 @@ label {
 }
 
 textarea {
-  width: 100%;
+  width: 75%;
   height: 200px;
+  color: #f9f8dd;
+  background-color: #191919;
+  border-radius: 2px;
+  border: 1px solid #121212;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
 }
 
 input[type=checkbox] {
