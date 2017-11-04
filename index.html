@@ -18,16 +18,6 @@
     <script src="js/JSONModelGraphics.js"></script>
     <script src="js/Model.js"></script>
     <script src="js/Canvas.js"></script>
-
-    <script>
-      /*global $ */
-      "use strict";
-      
-      $(document).ready(function() {
-        $("#model_structure").show();
-        $("#generate").show();
-      });
-    </script>
   </head>
   <body>
 
@@ -44,10 +34,14 @@
     
     <div id="menu-wrapper">
       <h1>Insert the DEVS model (JSON data)</h1>
-      <textarea id="model_structure" style="display: none"></textarea>
+      <textarea id="model_structure"></textarea>
+      <div>
+        <button id="generate" class="big" type="button" onclick="new_input_model();">Generate model</button>
+      </div>
+      
       <h2>Options</h2>
-      <div id="options-wrapper">
-        <ul>
+      <div class="options-wrapper">
+        <ul class="two-column-list">
           <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();" checked> Squared models</textarea></li>
           <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> show port message types</textarea></li>
           <li><input type="checkbox" name="show_port_name" value="squared" onchange="update_options();" checked> show port name</textarea></li>
@@ -55,9 +49,20 @@
           <li><input type="checkbox" name="sort_ports_by_name" value="squared" onchange="update_options();" checked> sort ports by name</textarea></li>
         </ul>
       </div>
-      <div>
-        <button id="generate" type="button" onclick="new_input_model();" style="display: none">Generate model</button>
+
+      <h2>Actions</h2>
+      <div class="options-wrapper">
+        <ul class="two-column-list">
+          <li><button type="button" onclick="expand_in_new_canvas_selected();">Expand in new canvas</button></li>
+          <li><button type="button" onclick="remove_selected_top_models();">remove model</button></li>
+          <li><button type="button" onclick="toggle_selected();">Expand / contract</button></li>
+          <li><button type="button" onclick="remove_links_selected();">remove links</button></li>
+          <li><button type="button" onclick="show_submodel_links_selected();">show submodel link</button></li>
+          <li><button type="button" onclick="toggle_port_name_selected();">Show / hide port names</button></li>
+          <li><button type="button" onclick="export_model_json_selected();">Export to JSON</button></li>
+        </ul>
       </div>
+      
     </div>
   </div>
   </body>
