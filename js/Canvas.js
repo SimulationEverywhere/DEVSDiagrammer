@@ -52,8 +52,11 @@ Canvas.prototype.initialize = function(parameters) {
     this.id = "stage_canvas_" + canvas_id.toString();
     this.canvas_id++;
     
-    this.dom_canvas = $('<canvas/>',{'Width':1000,'Height':800, 'id': this.id });
-    $('body').append(this.dom_canvas);
+    // 'Width':'90%','Height':'800'
+    this.dom_canvas = $('<canvas/>',{'id': this.id });
+    $('#models-wrapper').append(this.dom_canvas);
+    this.dom_canvas.attr('width', this.dom_canvas.width());
+    this.dom_canvas.attr('height', this.dom_canvas.height());
 
     this.stage = new createjs.Stage(this.dom_canvas.get(0));
     this.subStage = new createjs.Container();

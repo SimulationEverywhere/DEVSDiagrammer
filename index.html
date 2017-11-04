@@ -30,29 +30,34 @@
     </script>
   </head>
   <body>
+
+  <header>
+    DEVS Diagrammer
+  </header>
   
   <!-- hiden button for export JSON -->
   <a id="downloadModelJSON" style="display:none"></a>
   <!-- hiden button for export JSON -->
 
-  <div id="input_wrapper">
-    <label for="model_structure"><h1>Insert the DEVS model (JSON data)<h1></label>
-    <textarea id="model_structure" style="display: none"></textarea>
+  <div id='body-wrapper'>
+    <div id="models-wrapper"></div>
+    
+    <div id="menu-wrapper">
+      <h1>Insert the DEVS model (JSON data)<h1>
+      <textarea id="model_structure" style="display: none"></textarea>
+      <div>
+        <button id="generate" type="button" onclick="new_input_model();" style="display: none">Generate model</button>
+      </div>
+      <div id="options-wrapper">
+        <ul>
+          <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();" checked> Squared models</textarea></li>
+          <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> show port message types</textarea></li>
+          <li><input type="checkbox" name="show_port_name" value="squared" onchange="update_options();" checked> show port name</textarea></li>
+          <li><input type="checkbox" name="compress_in_left" value="squared" onchange="update_options();"> compress submodels in left</textarea></li>
+          <li><input type="checkbox" name="sort_ports_by_name" value="squared" onchange="update_options();" checked> sort ports by name</textarea></li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div id="options_wrapper">
-    <ul>
-      <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();" checked> Squared models</textarea></li>
-      <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> show port message types</textarea></li>
-      <li><input type="checkbox" name="show_port_name" value="squared" onchange="update_options();" checked> show port name</textarea></li>
-      <li><input type="checkbox" name="compress_in_left" value="squared" onchange="update_options();"> compress submodels in left</textarea></li>
-      <li><input type="checkbox" name="sort_ports_by_name" value="squared" onchange="update_options();" checked> sort ports by name</textarea></li>
-    </ul>
-  </div>
-  <div>
-    <button id="generate" type="button" onclick="new_input_model();" style="display: none">Generate model</button>
-  </div>
-  <!--
-  <canvas id="stageCanvas" width="1200" height="916"></canvas>
-  -->
   </body>
 </html>
