@@ -75,19 +75,17 @@ Canvas.prototype.initialize = function(parameters) {
         canvas: this
     });
 
-    structure = parameters.structure;
-    if (structure === undefined || structure === null) {
-        structure = JSON.parse($(parameters.structure_input_id).val());
-        graphics = structure.graphics;
+    if (parameters.json_input !== undefined && parameters.json_input !== null) {
+        structure = parameters.json_input;
+        graphics = structure.graphics || {};
         delete structure.graphics;
-    }
-
-    jsonGraphics = parameters.jsonGraphics;
-    if (jsonGraphics === undefined || jsonGraphics === null) {
         jsonGraphics = new JSONModelGraphics({
             id: structure.id,
             json: graphics
         });
+    } else {
+        structure = parameters.structure;
+        jsonGraphics = parameters.jsonGraphics;
     }
     
     this.top_model = new Model({

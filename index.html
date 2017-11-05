@@ -33,10 +33,13 @@
     <div id="models-wrapper"></div>
     
     <div id="menu-wrapper">
-      <h1>Insert DEVS model (JSON data)</h1>
+      <h2>Upload DEVS model (JSON data)</h2>
+      <label for="file">Choose a file</label>
+      <input type="file" id="file" name="file" class="inputfile" onchange="new_input_model(true, event);">
+      <h2>Write DEVS model (JSON data)</h2>
       <textarea id="model_structure"></textarea>
       <div>
-        <button id="generate" class="big" type="button" onclick="new_input_model();">Generate model</button>
+        <button id="generate" class="big" type="button" onclick="new_input_model(false);">Generate model</button>
       </div>
       
       <h2>Options</h2>

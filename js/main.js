@@ -127,8 +127,21 @@ function new_model(structure, jsonGraphics) {
 	});
 }
 
-function new_input_model() {
-    new Canvas({ structure_input_id: "#model_structure" });
+function new_input_model(from_file, evt) {
+    var reader, structure;
+
+    if (from_file) {
+        reader = new FileReader();
+        reader.onload = function() {
+            evt.target.value = "";
+            structure = JSON.parse(reader.result);
+            new Canvas({ json_input: structure });
+        };
+        reader.readAsText(evt.target.files[0]);
+    } else {
+        structure = JSON.parse($("#model_structure").val());
+        new Canvas({ json_input: structure });
+    }
 }
 
 $(window).keydown(function (e) {
