@@ -27,7 +27,7 @@
  * 
  */
 
-/*global $, createjs, Model, JSONModelGraphics */
+/*global $, createjs, Model, JSONModelGraphics, manifest, Square */
 /*export Canvas */
 "use strict";
 
@@ -65,6 +65,16 @@ Canvas.prototype.initialize = function(parameters) {
     this.stageWidth  = this.dom_canvas.width();
     this.stageHeight = this.dom_canvas.height();
 
+    this.background = new Square({
+        strokeWidth: 0,
+        radius: 0,
+        width: this.stageWidth,
+        height: this.stageHeight,
+        strokeColor: manifest.subStage.strokeColor,
+        fillColor: manifest.subStage.fillColor,
+        canvas: this
+    });
+
     structure = parameters.structure;
     if (structure === undefined || structure === null) {
         structure = JSON.parse($(parameters.structure_input_id).val());
@@ -81,12 +91,13 @@ Canvas.prototype.initialize = function(parameters) {
     }
     
     this.top_model = new Model({
-    	is_top: true,
-    	canvas: this,
-    	structure: structure,
+        is_top: true,
+        canvas: this,
+        structure: structure,
         jsonGraphics: jsonGraphics
     });
 
+    this.subStage.addChild(this.background);
     this.subStage.addChild(this.top_model);
     this.stage.update();
 };

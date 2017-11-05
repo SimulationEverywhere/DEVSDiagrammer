@@ -31,6 +31,12 @@
 "use strict";
 
 var manifest = {
+
+    subStage: {
+        strokeColor: "#FFFFFF",
+        fillColor: "#FFFFFF"
+    },
+
     coupled : {
         background_color: "#FFFFFF",
         selected_color: "#96a4b1"

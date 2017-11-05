@@ -84,10 +84,22 @@ function show_submodel_links_selected() {
 function export_model_json_selected() {
 	
 	while (selected_models.length > 0) {
-		if (!selected_models[0].is_top) {
+		if (selected_models[0].is_top) {
 			export_model_json(selected_models[0]);
 		}
 		selected_models[0].toggle_selection(evt);
+	}
+}
+
+function export_model_image_selected(imgType) {
+	var model;
+
+	while (selected_models.length > 0) {
+		model = selected_models[0];
+		selected_models[0].toggle_selection(evt);
+		if (model.is_top) {
+			export_model_image(model, imgType);
+		}
 	}
 }
 
@@ -128,6 +140,8 @@ $(window).keydown(function (e) {
 		case 51: show_submodel_links_selected(); break;
 		case 52: toggle_port_name_selected(); break;
 		case 53: export_model_json_selected(); break;
+		case 54: export_model_image_selected('png'); break;
+		case 55: export_model_image_selected('jpeg'); break;
 	}
 });
 
@@ -147,8 +161,17 @@ function export_model_json(model) {
 	exportedJson.graphics = $.extend(true, {}, model.jsonGraphics.json);
 
 	var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportedJson, undefined, 4));
-	var downloadLink = document.getElementById('downloadModelJSON');
+	var downloadLink = document.getElementById('download');
 	downloadLink.setAttribute("href", dataStr);
 	downloadLink.setAttribute("download", model.id + ".json");
+	downloadLink.click();
+}
+
+function export_model_image(model, imgType) {
+	
+    var img = model.canvas.dom_canvas.get(0).toDataURL("image/" + imgType, 1.0);
+	var downloadLink = document.getElementById('download');
+    downloadLink.setAttribute("href", img);
+	downloadLink.setAttribute("download", model.id + "." + imgType);
 	downloadLink.click();
 }

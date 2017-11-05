@@ -560,7 +560,7 @@ Model.prototype.changeColor = function(color) {
         canvas: this.canvas,
         width: this.width,
         height: this.height,
-        radius: this.width * this.radius_percentage,
+        radius: 2,
         fillColor: color
     });
 
