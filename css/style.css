@@ -72,7 +72,8 @@ canvas {
 }
 
 button {
-  width: 170px;
+  cursor: pointer;
+  width: 171px;
   border: solid 2px #374c41;
   background-color: #104240;
   color: #a1a1a1;
