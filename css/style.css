@@ -110,16 +110,25 @@ li {
           class
    ======================== */
 
-.two-column-list {
-  -moz-column-count: 2;
+.two-column-list, .three-column-list {
   -moz-column-gap: 20px;
   -moz-column-fill: auto;
-  -webkit-column-count: 2;
   -webkit-column-gap: 20px;
   -webkit-column-fill: auto;
-  column-count: 2;
   column-gap: 20px;
   column-fill: auto;
+}
+
+.two-column-list {
+  column-count: 2;
+  -moz-column-count: 2;
+  -webkit-column-count: 2;
+}
+
+.thee-column-list {
+  column-count: 3;
+  -moz-column-count: 3;
+  -webkit-column-count: 3;
 }
 
 .list-wrapper {
