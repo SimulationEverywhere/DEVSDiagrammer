@@ -33,7 +33,7 @@
     <div id="models-wrapper"></div>
     
     <div id="menu-wrapper">
-      <h1>Insert the DEVS model (JSON data)</h1>
+      <h1>Insert DEVS model (JSON data)</h1>
       <textarea id="model_structure"></textarea>
       <div>
         <button id="generate" class="big" type="button" onclick="new_input_model();">Generate model</button>
@@ -43,10 +43,10 @@
       <div class="list-wrapper options-wrapper">
         <ul class="two-column-list">
           <li><input type="checkbox" name="squared_models" value="squared" onchange="update_options();" checked> Squared models</textarea></li>
-          <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> show port message types</textarea></li>
-          <li><input type="checkbox" name="show_port_name" value="squared" onchange="update_options();" checked> show port name</textarea></li>
-          <li><input type="checkbox" name="compress_in_left" value="squared" onchange="update_options();"> compress submodels in left</textarea></li>
-          <li><input type="checkbox" name="sort_ports_by_name" value="squared" onchange="update_options();" checked> sort ports by name</textarea></li>
+          <li><input type="checkbox" name="show_message_type" value="squared" onchange="update_options();"> Show port message types</textarea></li>
+          <li><input type="checkbox" name="show_port_name" value="squared" onchange="update_options();" checked> Show port name</textarea></li>
+          <li><input type="checkbox" name="compress_in_left" value="squared" onchange="update_options();"> Compress submodels in left</textarea></li>
+          <li><input type="checkbox" name="sort_ports_by_name" value="squared" onchange="update_options();" checked> Sort ports by name</textarea></li>
         </ul>
       </div>
 
@@ -54,14 +54,14 @@
       <div class="list-wrapper">
         <ul class="two-column-list">
           <li><button type="button" onclick="expand_in_new_canvas_selected();">Expand in new canvas</button></li>
-          <li><button type="button" onclick="remove_selected_top_models();">remove model</button></li>
-          <li><button type="button" onclick="toggle_selected();">Expand / contract</button></li>
-          <li><button type="button" onclick="remove_links_selected();">remove links</button></li>
-          <li><button type="button" onclick="show_submodel_links_selected();">show submodel link</button></li>
-          <li><button type="button" onclick="toggle_port_name_selected();">Show / hide port names</button></li>
-          <li><button type="button" onclick="export_model_json_selected();">Export to JSON</button></li>
-          <li><button type="button" onclick="export_model_image_selected('png');">Export to PNG</button></li>
-          <li><button type="button" onclick="export_model_image_selected('jpeg');">Export to JPEG</button></li>
+          <li><button type="button" onclick="remove_selected_top_models();">Remove model</button></li>
+          <li><button type="button" onclick="toggle_selected();">Expand / Contract</button></li>
+          <li><button type="button" onclick="remove_links_selected();">Remove links</button></li>
+          <li><button type="button" onclick="show_submodel_links_selected();">Show submodel link</button></li>
+          <li><button type="button" onclick="toggle_port_name_selected();">Show / Hide port names</button></li>
+          <li><button type="button" onclick="export_model_json_selected();">Export JSON</button></li>
+          <li><button type="button" onclick="export_model_image_selected('png');">Export PNG</button></li>
+          <li><button type="button" onclick="export_model_image_selected('jpeg');">Export JPEG</button></li>
         </ul>
       </div>
       
