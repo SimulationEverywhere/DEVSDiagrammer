@@ -127,21 +127,16 @@ function new_model(structure, jsonGraphics) {
 	});
 }
 
-function new_input_model(from_file, evt) {
+function new_input_model(evt) {
     var reader, structure;
 
-    if (from_file) {
-        reader = new FileReader();
-        reader.onload = function() {
-            evt.target.value = "";
-            structure = JSON.parse(reader.result);
-            new Canvas({ json_input: structure });
-        };
-        reader.readAsText(evt.target.files[0]);
-    } else {
-        structure = JSON.parse($("#model_structure").val());
+    reader = new FileReader();
+    reader.onload = function() {
+        evt.target.value = "";
+        structure = JSON.parse(reader.result);
         new Canvas({ json_input: structure });
-    }
+    };
+    reader.readAsText(evt.target.files[0]);
 }
 
 $(window).keydown(function (e) {
