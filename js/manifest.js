@@ -32,6 +32,10 @@
 
 var manifest = {
 
+    canvas: {
+        fps: 24,
+    },
+
     subStage: {
         strokeColor: "#FFFFFF",
         fillColor: "#FFFFFF"

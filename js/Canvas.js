@@ -97,5 +97,56 @@ Canvas.prototype.initialize = function(parameters) {
 
     this.subStage.addChild(this.background);
     this.subStage.addChild(this.top_model);
+
+    this.selectiveFTPStageUpdate(manifest.canvas.fps);
+
     this.stage.update();
+};
+
+/******************* selective stage update methods *******************************/
+
+/**
+ * If there are some stage graphic changes declared, update the stage graphics.
+ * 
+ */
+Canvas.prototype.updateStage = function () {
+
+  if (this.stageHasChanged) {
+    this.stage.updateStage();
+    this.stageHasChanged = false;
+    //console.log("update stage");
+  }
+};
+
+/**
+ * Declare a new stage graphic change.
+ *
+ */
+Canvas.prototype.declareNewStageChange = function () {
+  
+  this.stageHasChanged = true;
+  //console.log("new change");
+};
+
+/**
+ * Set the Ticker to check in each interval if there are graphic changes. If there are graphical chages, the stage is updated, if not no.
+ * This solution is between updating the screen in each interval of time and in each stage change. While no chages are made, the stage is not updated
+ * when change arrives, the stage is updated until a maximum of one chage per interval, if to changes are triggered in the same interval, their modifications
+ * will be visible at the same time at the end of the interval.
+ *
+ * @param {Number} fps - Defines the interval in Frame Per Seconds.
+ */
+Canvas.prototype.selectiveFTPStageUpdate = function (fps) {
+
+  if (!this.selectiveFTPEnabled) { 
+    this.stage.updateStage = this.stage.update.bind(this.stage);
+    this.stage.update = this.declareNewStageChange.bind(this);
+
+    this.stageHasChanged = false;
+    createjs.Ticker.setFPS(fps);
+    createjs.Ticker.addEventListener("tick", this.updateStage.bind(this));
+    this.selectiveFTPEnabled = true;
+  } else {
+    createjs.Ticker.setFPS(fps);
+  }
 };
