@@ -72,18 +72,25 @@ canvas {
 
 button {
   cursor: pointer;
-  width: 171px;
   border: solid 2px #374c41;
   background-color: #104240;
   color: #a1a1a1;
 
   border-radius: 2px;
-  box-shadow: 0px 0px 15px #171717;
+  box-shadow: 2px 3px 5px #171717;
 }
 
-button:hover {
+button:hover, label[for="model_file"]:hover, label:hover {
   background-color: #0e373a;
   color: #a1a1a1;
+}
+
+button.action {
+  width: 171px;
+}
+
+button.export {
+  width: 120px;
 }
 
 li {
@@ -92,7 +99,7 @@ li {
 }
 
 /* ========================
-          class
+      wrappers and lists
    ======================== */
 
 .two-column-list, .three-column-list {
@@ -110,10 +117,14 @@ li {
   -webkit-column-count: 2;
 }
 
-.thee-column-list {
+.three-column-list {
   column-count: 3;
   -moz-column-count: 3;
   -webkit-column-count: 3;
+  
+  padding: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .list-wrapper {
@@ -187,25 +198,16 @@ li {
 }
 
 /* ==========================
-          input file
+      model input file
    ========================== */
 
-.inputfile {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-}
-
-label[for="file"] {
+label[for="model_file"] {
 
   width: 400px;
-  height: 60px;
+  height: 30px;
   font-size: 20px;
   font-weight: bold;
-  line-height: 55px;
+  line-height: 30px;
 
   display: inline-block;
   margin-bottom: 10px;
@@ -218,22 +220,23 @@ label[for="file"] {
   color: #a1a1a1;
   border-radius: 2px;
   border: solid 2px #384d42;
-  box-shadow: 0px 0px 15px #171717;
+  box-shadow: 2px 3px 5px #171717;
 }
 
-label[for="file"]:hover {
-  background-color: #0e373a;
-} 
-
 /* =========================
-      Color picker
+        Color menu
    ========================= */
 
-input[type="color"] {
+input[type="color"], input[type="file"], button.color_button {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
   -webkit-appearance: none;
   border: none;
-  width: 0px;
-  opacity: 0;
+
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 }
 
 input[type="color"]::-webkit-color-swatch-wrapper {
@@ -247,8 +250,8 @@ input[type="color"]::-webkit-color-swatch {
 .color {
   cursor: pointer;
   display: inline-block;
-  width: 150px;
-  padding: 7px 3px;
+  width: 115px;
+  padding: 2px 6px 3px;
   text-align: center;
 
   border: solid 1px #384d42;

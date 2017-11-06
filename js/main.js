@@ -28,7 +28,8 @@
  */
 
 /*global $, Canvas, console, JSONModelGraphics, manifest */
-/*exported main, new_input_model, update_options, update_color */
+/*exported main, new_input_model, update_options, update_color, menu_init, 
+    import_colors, export_colors */
 "use strict";
 
 var canvases = [];
@@ -80,23 +81,23 @@ function remove_links_selected() {
 }
 
 function show_submodel_links_selected() {
-	
-	while (selected_models.length > 0) {
-		if (!selected_models[0].is_top) {
-			selected_models[0].parent.show_submodel_links(selected_models[0]);
-		}
-		selected_models[0].toggle_selection(evt);
-	}
+
+    while (selected_models.length > 0) {
+        if (!selected_models[0].is_top) {
+            selected_models[0].parent.show_submodel_links(selected_models[0]);
+        }
+        selected_models[0].toggle_selection(evt);
+    }
 }
 
 function export_model_json_selected() {
-	
-	while (selected_models.length > 0) {
-		if (selected_models[0].is_top) {
-			export_model_json(selected_models[0]);
-		}
-		selected_models[0].toggle_selection(evt);
-	}
+
+    while (selected_models.length > 0) {
+        if (selected_models[0].is_top) {
+            export_model_json(selected_models[0]);
+        }
+        selected_models[0].toggle_selection(evt);
+    }
 }
 
 function export_model_image_selected(imgType) {
@@ -148,17 +149,17 @@ function new_input_model(evt) {
 }
 
 $(window).keydown(function (e) {
-	switch(e.keyCode) {
-		case 13: expand_in_new_canvas_selected(); break;  
-		case 46: remove_selected_top_models(); break;
-		case 49: toggle_selected(); break;
-		case 50: remove_links_selected(); break;
-		case 51: show_submodel_links_selected(); break;
-		case 52: toggle_port_name_selected(); break;
-		case 53: export_model_json_selected(); break;
-		case 54: export_model_image_selected('png'); break;
-		case 55: export_model_image_selected('jpeg'); break;
-	}
+    switch(e.keyCode) {
+        case 13: expand_in_new_canvas_selected(); break;  
+        case 46: remove_selected_top_models(); break;
+        case 49: toggle_selected(); break;
+        case 50: remove_links_selected(); break;
+        case 51: show_submodel_links_selected(); break;
+        case 52: toggle_port_name_selected(); break;
+        case 53: export_model_json_selected(); break;
+        case 54: export_model_image_selected('png'); break;
+        case 55: export_model_image_selected('jpeg'); break;
+    }
 });
 
 function update_options() {
@@ -220,4 +221,56 @@ function menu_init() {
             $('label[model="' + model + '"]').css(element, manifest[model][element]);
         }
     }
+}
+
+function import_colors(evt) {
+    var reader, configurations, models, model, elements, element, i, j;
+
+    reader = new FileReader();
+    reader.onload = function() {
+        evt.target.value = "";
+        configurations = JSON.parse(reader.result);
+
+        models = ["coupled", "atomic", "port"];
+        elements = ["background-color", "color"];
+
+        for (i = 0; i < models.length; i++) {
+            model = models[i];
+            for (j = 0; j < elements.length; j++) {
+                element = elements[j];
+                if (typeof configurations[model][element] === "string") {
+                    manifest[model][element] = configurations[model][element];
+                    $('label[model="' + model + '"]').css(element, manifest[model][element]);
+                }
+            }
+        }
+
+        for (i = 0; i < canvases.length; i++) {
+            canvases[i].top_model.update_colors();
+        }
+    };
+    reader.readAsText(evt.target.files[0]);
+}
+
+function export_colors() {
+    var exportedJson, models, elements, model, element, i, j;
+    exportedJson = {};
+
+    models = ["coupled", "atomic", "port"];
+    elements = ["background-color", "color"];
+
+    for (i = 0; i < models.length; i++) {
+        model = models[i];
+        exportedJson[model] = {};
+        for (j = 0; j < elements.length; j++) {
+            element = elements[j];
+            exportedJson[model][element] = manifest[model][element];
+        }
+    }
+
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportedJson, undefined, 4));
+    var downloadLink = document.getElementById('download');
+    downloadLink.setAttribute("href", dataStr);
+    downloadLink.setAttribute("download", "DEVSDiagrammer_colors.json");
+    downloadLink.click();
 }
