@@ -27,37 +27,32 @@
  * 
  */
 
-/* exported manifest */
+/*exported calculate_selected_color */
 "use strict";
 
-var manifest = {
+function calculate_selected_color(color) {
+	var R, G, B;
+	if (color[0] === "#") {
+		color = color.substr(1, color.length);
+	}
 
-    subStage: {
-        strokeColor: "#FFFFFF",
-        fillColor: "#FFFFFF"
-    },
+	R = parseInt(color.substr(0, 2), 16);
+	G = parseInt(color.substr(2, 2), 16);
+	B = parseInt(color.substr(4, 2), 16);
 
-    coupled : {
-        "background-color": "#FFFFFF",
-        "color": "#000000"
-    },
+	if ( R > 50 && G > 50 && B > 50) {
+		R -= 20;
+		G -= 20;
+		B -= 20;
+	} else if (R < 200 && G < 200 && B < 200) {
+		R += 20;
+		G += 20;
+		B += 20;
+	} else {
+		R += Math.max(0, R - 20);
+		G += Math.max(0, G - 20);
+		B += Math.max(0, B - 20);
+	}
 
-    atomic: {
-        "background-color": "#e7e4c6",    
-        "color": "#000000"
-    },
-
-    port: {
-        "background-color": "#FFFFFF",    
-        "color": "#000000",
-        font_size: 12,
-        ratio: 1.5, // two time more width than height
-    },
-
-    link: {
-        color: "#000000",
-        margin: 5,
-        epsilon: 0.5,
-        node_epsilon: 2
-    }
-};
+	return '#' + R.toString(16) + G.toString(16) + B.toString(16);
+}

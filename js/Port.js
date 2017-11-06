@@ -74,8 +74,8 @@ Port.prototype.initialize = function(parameters) {
     this.regX = this.width / 2;
     this.regY = this.height / 2;
 
-    this.draw_box();
-    this.draw_name();
+    this.update_box();
+    this.update_name();
 
     if (options.show_message_type) {
         this.draw_message_type();
@@ -84,21 +84,33 @@ Port.prototype.initialize = function(parameters) {
     this.canvas.stage.update();
 };
 
-Port.prototype.draw_box = function() {
+Port.prototype.update_box = function() {
+    if (this.port_box !== undefined) {
+        this.removeChild(this.port_box);
+    }    
+
     this.port_box = new Square({
         canvas: this.canvas,
-        fillColor: this.fillColor,
+        fillColor: manifest.port["background-color"],
         width: this.width,
         height: this.height
     });
     this.addChild(this.port_box);
+    this.canvas.stage.update();
 };
 
-Port.prototype.draw_name = function() {
+Port.prototype.update_colors = function() {
+    this.update_box();
+    this.update_name();
+};
 
+Port.prototype.update_name = function() {
+    if (this.port_name !== undefined) {
+        this.removeChild(this.port_name);
+    }
 
     var text_style = this.font_size.toString() + "px Arial";
-    this.port_name = new createjs.Text(this.id, text_style, this.text_color);
+    this.port_name = new createjs.Text(this.id, text_style, manifest.port["color"]);
     this.port_name.textBaseline = "top";
 
     this.port_name.y = 2;
@@ -110,6 +122,8 @@ Port.prototype.draw_name = function() {
     if (!options.show_port_name) {
         this.port_name.visible = true;
     }
+
+    this.canvas.stage.update();
 };
 
 Port.prototype.draw_message_type = function() {

@@ -9,6 +9,7 @@
 
     <script src="vendors/js/createjs/createjs-2013.12.12.min.js"></script>
     <script src="vendors/js/jquery-3.2.1/jquery-3.2.1.min.js"></script>
+    <script src="js/ColorCodes.js"></script>
     <script src="js/main.js"></script>
     <script src="js/manifest.js"></script>
     <script src="js/toposort.js"></script>
@@ -18,6 +19,13 @@
     <script src="js/JSONModelGraphics.js"></script>
     <script src="js/Model.js"></script>
     <script src="js/Canvas.js"></script>
+  
+    <script type="text/javascript">
+      $(document).ready(function() {
+        menu_init();
+      });
+    </script>
+
   </head>
   <body>
 
@@ -51,10 +59,12 @@
       <h2>Model colors</h2>
       <div class="list-wrapper options-wrapper">
         <ul class="two-column-list">
-          <li><label class="color" model="coupled" for="coupled-bg-color"><input model="coupled" element="background-color" type="color" onchange="update_color(event);" id="coupled-bg-color" name="coupled-bg-color">Coupled model color</li>
-          <li><label class="color" model="atomic" for="atomic-bg-color">  <input model="atomic"  element="background-color" type="color" onchange="update_color(event);" id="atomic-bg-color" name="atomic-bg-color">Atomic model color</li>
-          <li><label class="color" model="port" for="ports-bg-color">    <input model="port"    element="background-color" type="color" onchange="update_color(event);" id="ports-bg-color" name="ports-bg-color">Ports color</li>
-          <li><label class="color" model="port" for="ports-text-color">  <input model="port"    element="color"            type="color" onchange="update_color(event);" id="ports-text-color" name="ports-text-color">Ports text color</li>
+          <li><label class="color" model="coupled" for="coupled-bg-color">  <input model="coupled" element="background-color" type="color" onchange="update_color(event);" id="coupled-bg-color" name="coupled-bg-color">Coupled model color</li>
+          <li><label class="color" model="atomic" for="atomic-bg-color">    <input model="atomic"  element="background-color" type="color" onchange="update_color(event);" id="atomic-bg-color" name="atomic-bg-color">Atomic model color</li>
+          <li><label class="color" model="port" for="ports-bg-color">       <input model="port"    element="background-color" type="color" onchange="update_color(event);" id="ports-bg-color" name="ports-bg-color">Ports color</li>
+          <li><label class="color" model="coupled" for="coupled-text-color"><input model="coupled" element="color"            type="color" onchange="update_color(event);" id="coupled-text-color" name="coupled-text-color">Coupled text color</li>
+          <li><label class="color" model="atomic" for="atomic-text-color">  <input model="atomic"  element="color"            type="color" onchange="update_color(event);" id="atomic-text-color" name="atomic-text-color">Atomic text color</li>
+          <li><label class="color" model="port" for="ports-text-color">     <input model="port"    element="color"            type="color" onchange="update_color(event);" id="ports-text-color" name="ports-text-color">Ports text color</li>
         </ul>
       </div>
 

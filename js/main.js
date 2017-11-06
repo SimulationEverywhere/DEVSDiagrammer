@@ -206,3 +206,18 @@ function update_color(evt) {
         canvases[i].top_model.update_colors();
     }
 }
+
+function menu_init() {
+    var model, models, element, elements, i, j;
+
+    models = ["coupled", "atomic", "port"];
+    elements = ["background-color", "color"];
+
+    for (i = 0; i < models.length; i++) {
+        model = models[i];
+        for (j = 0; j < elements.length; j++) {
+            element = elements[j];
+            $('label[model="' + model + '"]').css(element, manifest[model][element]);
+        }
+    }
+}

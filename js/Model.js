@@ -28,7 +28,7 @@
  */
 
 /*global console, createjs, $, Square, Port, Link, relaxed_khan, selected_models,
-         manifest, options, sort_ports, JSONModelGraphics */
+         manifest, options, sort_ports, JSONModelGraphics, calculate_selected_color */
 /*exported Model */
 
 "use strict";
@@ -158,23 +158,28 @@ Model.prototype.draw_coupled = function() {
     
     if (this.structure.type === "coupled") {
         this["background-color"] = manifest.coupled['background-color'];
-        this.selected_color =  manifest.coupled.selected_color;
     } else {
         this["background-color"] = manifest.atomic["background-color"];
-        this.selected_color = manifest.atomic.selected_color;
     }
     
-    this.changeColor(this["background-color"]);
-    this.draw_name();
+    this.update_box(this["background-color"]);
+    this.update_name();
     this.draw_ports();
 
     this.canvas.stage.update();
 };
 
-Model.prototype.draw_name = function() {
+Model.prototype.update_name = function() {
+    if (this.name !== undefined) {
+        this.removeChild(this.name);
+    }
 
+    var color;
+    if (this.structure.type == Model.type.atomic) color = manifest.atomic.color;
+    else color = manifest.coupled.color;
+    
     var text_style = "24px Arial";
-    this.name = new createjs.Text(this.id, text_style, this.textColor);
+    this.name = new createjs.Text(this.id, text_style, color);
     this.name.textBaseline = "top";
     this.name.y = 2;
     this.name.x = this.width / 2;
@@ -218,7 +223,6 @@ Model.prototype.add_ports = function(structure_ports, graphical_ports, x, kind) 
     for(i = 0; i < sorted_structure_ports.length; ++i) {
         port = new Port({
             canvas: this.canvas,
-            fillColor: "#FFFFFF",
             height: height,
             kind: kind,
             id: sorted_structure_ports[i].name,
@@ -557,20 +561,29 @@ Model.prototype.update_submodel_link = function(submodel) {
 Model.prototype.update_colors = function() {
     var i;
 
-
     if (this.structure.type === Model.type.atomic) {
-        this.changeColor(manifest.atomic['background-color']);
+        this.update_box(manifest.atomic['background-color']);
         this["background-color"] = manifest.atomic['background-color'];
     } else {
-        this.changeColor(manifest.coupled['background-color']);
+        this.update_box(manifest.coupled['background-color']);
         this["background-color"] = manifest.coupled['background-color'];
         for (i = 0; i < this.models.length; i++) {
             this.models[i].update_colors();
         }
     }
+    
+    this.update_name();
+
+    for(i = 0; i < this.ports.in.length; i++) {
+        this.ports.in[i].update_colors();
+    }
+
+    for(i = 0; i < this.ports.out.length; i++) {
+        this.ports.out[i].update_colors();
+    }
 };
 
-Model.prototype.changeColor = function(color) {
+Model.prototype.update_box = function(color) {
     this.removeChild(this.model_box);
 
     this.model_box = new Square({
@@ -673,7 +686,7 @@ Model.prototype.toggle_selection = function(evt) {
 
     if (this.is_selected) {
         selected_models.push(this);
-        this.changeColor(this.selected_color);
+        this.update_box(calculate_selected_color(this["background-color"]));
 
     } else {
         var i = 0;
@@ -685,7 +698,7 @@ Model.prototype.toggle_selection = function(evt) {
             }
         }
 
-        this.changeColor(this["background-color"]);
+        this.update_box(this["background-color"]);
     }
 };
 
