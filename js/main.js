@@ -27,8 +27,8 @@
  * 
  */
 
-/*global $, Canvas, console, JSONModelGraphics */
-/*exported main, new_input_model, update_options */
+/*global $, Canvas, console, JSONModelGraphics, manifest */
+/*exported main, new_input_model, update_options, update_color */
 "use strict";
 
 var selected_models = [];
@@ -182,4 +182,14 @@ function export_model_image(model, imgType) {
     downloadLink.setAttribute("href", img);
 	downloadLink.setAttribute("download", model.id + "." + imgType);
 	downloadLink.click();
+}
+
+function update_color(evt) {
+    var attributes = evt.target.attributes;
+    var model = attributes.model.value;
+    var element = attributes.element.value;
+    var value = evt.target.value;
+
+    manifest[model][element] = value;
+    $('label[model="' + model + '"]').css(element, value);
 }
