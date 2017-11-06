@@ -63,7 +63,7 @@ header {
 
 canvas {
   width: 90%;
-  height: 800px;
+  height: calc(90vh - 65px);
   margin-top: 30px;
   background-color: #FFFFFF;
   border-radius: 7px;
