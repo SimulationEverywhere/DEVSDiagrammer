@@ -47,12 +47,12 @@ var manifest = {
     },
 
     atomic: {
-        "background-color": "#e7e4c6",    
+        "background-color": "#ebebeb",
         "color": "#000000"
     },
 
     port: {
-        "background-color": "#FFFFFF",    
+        "background-color": "#ffffff",
         "color": "#000000",
         font_size: 12,
         ratio: 1.5, // two time more width than height
