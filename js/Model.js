@@ -117,7 +117,6 @@ Model.prototype.initialize = function(parameters) {
         this.height = this.jsonGraphics.json.model_box.height;
         this.regX = this.jsonGraphics.json.model_box.regX;
         this.regY = this.jsonGraphics.json.model_box.regY;
-
     }
     
     if (this.parent_dimentions !== undefined) {
@@ -144,6 +143,8 @@ Model.prototype.initialize = function(parameters) {
     this.addEventListener("pressup", this.release.bind(this));
 };
 
+Model.type = {atomic: "atomic", coupled: "coupled"};
+
 Model.empty_structure = {
     type: "atomic", // by default asumes it's an empty atomic model
     models: [],
@@ -156,14 +157,14 @@ Model.empty_structure = {
 Model.prototype.draw_coupled = function() {
     
     if (this.structure.type === "coupled") {
-        this.background_color = manifest.coupled.background_color;
+        this["background-color"] = manifest.coupled['background-color'];
         this.selected_color =  manifest.coupled.selected_color;
     } else {
-        this.background_color = manifest.atomic.background_color;
+        this["background-color"] = manifest.atomic["background-color"];
         this.selected_color = manifest.atomic.selected_color;
     }
     
-    this.changeColor(this.background_color);
+    this.changeColor(this["background-color"]);
     this.draw_name();
     this.draw_ports();
 
@@ -260,7 +261,6 @@ Model.prototype.clean = function(models) {
 
 Model.prototype.expand = function() {
 
-
     if (this.structure.type === "atomic" ||
         this.structure.models.length === 0 ||
         this.is_expanded) { return; }
@@ -292,6 +292,7 @@ Model.prototype.expand = function() {
     var modelHorizontalSpace = (this.width / modelsByColumns.length);
 
     for (j = 0; j < modelsByColumns.length; j++) {
+
         columnMoldes = modelsByColumns[j];
         x = modelHorizontalSpace / 2 + j * modelHorizontalSpace;
         for (i = 0; i < columnMoldes.length; i++) {
@@ -306,7 +307,7 @@ Model.prototype.expand = function() {
                     width: modelsWidth,
                     height: modelsHeight,
                     regX: modelsWidth / 2,
-                    regY: modelsHeight / 2, 
+                    regY: modelsHeight / 2
                 });
             }
 
@@ -553,6 +554,22 @@ Model.prototype.update_submodel_link = function(submodel) {
     this.canvas.stage.update();
 };
 
+Model.prototype.update_colors = function() {
+    var i;
+
+
+    if (this.structure.type === Model.type.atomic) {
+        this.changeColor(manifest.atomic['background-color']);
+        this["background-color"] = manifest.atomic['background-color'];
+    } else {
+        this.changeColor(manifest.coupled['background-color']);
+        this["background-color"] = manifest.coupled['background-color'];
+        for (i = 0; i < this.models.length; i++) {
+            this.models[i].update_colors();
+        }
+    }
+};
+
 Model.prototype.changeColor = function(color) {
     this.removeChild(this.model_box);
 
@@ -668,7 +685,7 @@ Model.prototype.toggle_selection = function(evt) {
             }
         }
 
-        this.changeColor(this.background_color);
+        this.changeColor(this["background-color"]);
     }
 };
 

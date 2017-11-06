@@ -31,6 +31,8 @@
 /*exported main, new_input_model, update_options, update_color */
 "use strict";
 
+var canvases = [];
+
 var selected_models = [];
 
 var options = {
@@ -46,9 +48,15 @@ var evt = {
 };
 
 function remove_selected_top_models() {
-	
+	var i;
+
 	while (selected_models.length > 0) {
 		if (selected_models[0].is_top) {
+            for (i = 0; i < canvases.length; i++) {
+                if (canvases[i].top_model.id === selected_models[0].id) {
+                    canvases.splice(i, 1);
+                }
+            }
 			selected_models[0].canvas.dom_canvas.remove();
 		}
 		selected_models[0].toggle_selection(evt);		
@@ -118,13 +126,13 @@ function toggle_port_name_selected() {
 }
 
 function new_model(structure, jsonGraphics) {
-	new Canvas({
+	canvases.push(new Canvas({
 		structure: structure,
 		jsonGraphics: new JSONModelGraphics({
 			id: jsonGraphics.id,
 			json: $.extend(true, {}, jsonGraphics)
 		})
-	});
+	}));
 }
 
 function new_input_model(evt) {
@@ -134,7 +142,7 @@ function new_input_model(evt) {
     reader.onload = function() {
         evt.target.value = "";
         structure = JSON.parse(reader.result);
-        new Canvas({ json_input: structure });
+        canvases.push(new Canvas({ json_input: structure }));
     };
     reader.readAsText(evt.target.files[0]);
 }
@@ -185,6 +193,7 @@ function export_model_image(model, imgType) {
 }
 
 function update_color(evt) {
+    var i;
     var attributes = evt.target.attributes;
     var model = attributes.model.value;
     var element = attributes.element.value;
@@ -192,4 +201,8 @@ function update_color(evt) {
 
     manifest[model][element] = value;
     $('label[model="' + model + '"]').css(element, value);
+
+    for (i = 0; i < canvases.length; i++) {
+        canvases[i].top_model.update_colors();
+    }
 }

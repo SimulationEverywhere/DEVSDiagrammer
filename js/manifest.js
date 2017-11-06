@@ -38,12 +38,12 @@ var manifest = {
     },
 
     coupled : {
-        background_color: "#FFFFFF",
+        "background-color": "#FFFFFF",
         selected_color: "#96a4b1"
     },
 
     atomic: {
-        background_color: "#538842",    
+        "background-color": "#538842",    
         selected_color: "#20482e"
     },
 
