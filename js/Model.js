@@ -75,6 +75,7 @@ Model.prototype.initialize = function(parameters) {
 
     /************ status values *************/
     this.is_expanded = false;
+    this.showing_links = true;
     this.dragged_child = false;
     this.selected = false;
 
@@ -135,7 +136,7 @@ Model.prototype.initialize = function(parameters) {
 
     this.draw_coupled();
 
-    if (this.is_top) this.expand();
+    if (this.is_top) this.toggle_models();
 
     this.addEventListener("click", this.toggle_selection.bind(this));
     this.addEventListener("mousedown", this.hold.bind(this));
@@ -161,11 +162,13 @@ Model.prototype.draw_coupled = function() {
     } else {
         this["background-color"] = manifest.atomic["background-color"];
     }
-    
+
     this.update_box(this["background-color"]);
     this.update_name();
     this.draw_ports();
 
+    this.draw_internal_structure();
+    
     this.canvas.stage.update();
 };
 
@@ -263,11 +266,9 @@ Model.prototype.clean = function(models) {
     }
 };
 
-Model.prototype.expand = function() {
+Model.prototype.draw_internal_structure = function() {
 
-    if (this.structure.type === "atomic" ||
-        this.structure.models.length === 0 ||
-        this.is_expanded) { return; }
+    if (this.structure.type === "atomic" || this.structure.models.length === 0 ) { return; }
 
     var modelsByColumns, highestColum, modelsWidth, modelsHeight, i, j, x;
     var model, columnMoldes, modelStructure, jsonGraphics;
@@ -316,6 +317,7 @@ Model.prototype.expand = function() {
             }
 
             model = new Model({
+                visible: false,
                 canvas: this.canvas,
                 jsonGraphics: jsonGraphics,
                 structure: $.extend(true, {}, modelStructure),
@@ -326,11 +328,8 @@ Model.prototype.expand = function() {
         }
     }
 
-
     this.draw_links();
-
     this.canvas.stage.update();
-    this.is_expanded = true;
 };
 
 Model.prototype.draw_links = function() {
@@ -339,6 +338,8 @@ Model.prototype.draw_links = function() {
     this.draw_ic(this.structure.ic);
     this.draw_eic(this.structure.eic);
     this.draw_eoc(this.structure.eoc);
+
+    this.showing_links = true;
 };
 
 Model.prototype.draw_ic = function(ics) {
@@ -409,6 +410,8 @@ Model.prototype.connect = function(from_port, to_port, information, kind, nodes,
     }
 
     link = new Link({
+        visible: this.showing_links,
+        last_visible: true,
         canvas: this.canvas,
         kind: kind,
         information: information,
@@ -466,7 +469,7 @@ Model.prototype.get_model = function(id) {
     }
 };
 
-Model.prototype.contract = function() {
+Model.prototype.clean_internal_graphics = function() {
     
     this.remove_links();
     this.clean(this.models);
@@ -476,32 +479,45 @@ Model.prototype.contract = function() {
 };
 
 Model.prototype.remove_links = function() {
+    
     this.clean(this.eic);
     this.clean(this.eoc);
     this.clean(this.ic);
+
+    this.showing_links = false;
+
     this.canvas.stage.update();
 };
 
 Model.prototype.show_submodel_links = function(submodel) {
-    var ic = this.structure.ic.filter(function(link) {
-        return link.from_model === submodel.id || link.to_model === submodel.id;
-    });
-    var eic = this.structure.eic.filter(function(link) {
-        return link.to_model === submodel.id;
-    });
-    var eoc = this.structure.eoc.filter(function(link) {
-        return link.from_model === submodel.id;
-    });
+    var i;
+    var links = [];
 
-    this.draw_ic(ic);
-    this.draw_eic(eic);
-    this.draw_eoc(eoc);
+    links = links.concat(this.ic.filter(function(link) {
+        return link.information.from_model === submodel.id || link.information.to_model === submodel.id;
+    }));
+
+    links = links.concat(this.eic.filter(function(link) {
+        return link.information.to_model === submodel.id;
+    }));
+
+    links = links.concat(this.eoc.filter(function(link) {
+        return link.information.from_model === submodel.id;
+    }));
+
+    for (i = 0; i < links.length; i++) {
+        links[i].visible = !links[i].visible;
+    }
+
+    //this.draw_ic(ic);
+    //this.draw_eic(eic);
+    //this.draw_eoc(eoc);
 
     this.canvas.stage.update();
 };
 
 Model.prototype.update_submodel_link = function(submodel) {
-    var i, from_port, to_port, submodel_ports_in, submodel_ports_out, information, nodes, link;
+    var i, from_port, to_port, submodel_ports_in, submodel_ports_out, information, nodes, link, visible;
 
     submodel_ports_in = submodel.ports.in.map(function(p) { return p.id; });
     submodel_ports_out = submodel.ports.out.map(function(p) { return p.id; });
@@ -513,11 +529,13 @@ Model.prototype.update_submodel_link = function(submodel) {
             to_port = this.eic[i].to_port;
             information = this.eic[i].information;
             nodes = this.eic[i].nodes;
+            visible = this.eic[i].visible;
 
             this.removeChild(this.eic[i]);
             this.eic.splice(i, 1);
             
             link = this.connect(from_port, to_port, information, Link.Kind.EIC, nodes, false);
+            link.visible = visible;
             this.jsonGraphics.save_eic_nodes(information, link.nodes);
             this.eic.push(link);
         }
@@ -529,11 +547,13 @@ Model.prototype.update_submodel_link = function(submodel) {
             to_port = this.eoc[i].to_port;
             information = this.eoc[i].information;
             nodes = this.eoc[i].nodes;
+            visible = this.eoc[i].visible;
             
             this.removeChild(this.eoc[i]);
             this.eoc.splice(i, 1);
             
             link = this.connect(from_port, to_port, information, Link.Kind.EOC, nodes, false);
+            link.visible = visible;
             this.jsonGraphics.save_eoc_nodes(information, link.nodes);
             this.eoc.push(link);
         }
@@ -545,11 +565,13 @@ Model.prototype.update_submodel_link = function(submodel) {
             to_port = this.ic[i].to_port;
             information = this.ic[i].information;
             nodes = this.ic[i].nodes;
+            visible = this.ic[i].visible;
             
             this.removeChild(this.ic[i]);
             this.ic.splice(i, 1);
             
             link = this.connect(from_port, to_port, information, Link.Kind.IC, nodes, false);
+            link.visible = visible;
             this.jsonGraphics.save_ic_nodes(information, link.nodes);
             this.ic.push(link);
         }
@@ -598,12 +620,51 @@ Model.prototype.update_box = function(color) {
     this.canvas.stage.update();
 };
 
-Model.prototype.toggle = function() {
+Model.prototype.change_models_visibility = function(visible) {
+    var i;
+
+    for(i = 0; i < this.models.length; i++) {
+        this.models[i].visible = visible;
+    }
+
+    this.canvas.stage.update();
+};
+
+Model.prototype.change_links_visibility = function(visible, by_expansion) {
+    var i, last_visible;
+
+    if (by_expansion === undefined) by_expansion = false;
+
+    for(i = 0; i < this.ic.length; i++) {
+        last_visible = this.ic[i].last_visible;
+        this.ic[i].last_visible = this.ic[i].visible;
+        this.ic[i].visible = visible && !(by_expansion && last_visible === false);
+    }
+
+    for(i = 0; i < this.eic.length; i++) {
+        last_visible = this.eic[i].last_visible;
+        this.eic[i].last_visible = this.eic[i].visible;
+        this.eic[i].visible = visible && !(by_expansion && last_visible === false);
+    }
+
+    for(i = 0; i < this.eoc.length; i++) {
+        last_visible = this.eoc[i].last_visible;
+        this.eoc[i].last_visible = this.eoc[i].visible;
+        this.eoc[i].visible = visible && !(by_expansion && last_visible === false);
+    }
+    
+    this.canvas.stage.update();
+};
+
+Model.prototype.toggle_models = function() {
+
+    this.is_expanded = !this.is_expanded;
+    this.change_models_visibility(this.is_expanded);
 
     if (this.is_expanded) {
-        this.contract();
+        this.change_links_visibility(this.showing_links, true);
     } else {
-        this.expand();
+        this.change_links_visibility(false);
     }
 };
 
@@ -614,6 +675,12 @@ Model.prototype.toggle_port_names = function() {
     } else {
         this.show_port_names();
     }
+};
+
+Model.prototype.toggle_links = function() {
+
+    this.showing_links = !this.showing_links;
+    this.change_links_visibility(this.showing_links);
 };
 
 Model.prototype.show_port_names = function() {

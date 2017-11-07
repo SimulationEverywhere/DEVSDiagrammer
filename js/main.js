@@ -72,10 +72,10 @@ function expand_in_new_canvas_selected() {
 	}
 }
 
-function remove_links_selected() {
+function toggle_links_selected() {
 	
 	while (selected_models.length > 0) {
-		selected_models[0].remove_links(false);
+		selected_models[0].toggle_links();
 		selected_models[0].toggle_selection(evt);
 	}
 }
@@ -112,9 +112,9 @@ function export_model_image_selected(imgType) {
 	}
 }
 
-function toggle_selected() {
+function toggle_models_selected() {
 	while (selected_models.length > 0) {
-		selected_models[0].toggle();
+		selected_models[0].toggle_models();
 		selected_models[0].toggle_selection(evt);
 	}
 }
@@ -152,8 +152,8 @@ $(window).keydown(function (e) {
     switch(e.keyCode) {
         case 13: expand_in_new_canvas_selected(); break;  
         case 46: remove_selected_top_models(); break;
-        case 49: toggle_selected(); break;
-        case 50: remove_links_selected(); break;
+        case 49: toggle_models_selected(); break;
+        case 50: toggle_links_selected(); break;
         case 51: show_submodel_links_selected(); break;
         case 52: toggle_port_name_selected(); break;
         case 53: export_model_json_selected(); break;
