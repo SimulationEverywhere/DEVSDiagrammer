@@ -157,17 +157,20 @@ Link.prototype.get_new_node_index = function(node) {
 };
 
 Link.prototype.scale_node_positions = function() {
-    var new_horizontal_distance, current_horizontal_distance, scale, i;
+    var new_x_distance, current_x_distance, new_y_distance, current_y_distance, scaleX, scaleY, i;
 
-    current_horizontal_distance = Math.abs(this.nodes[0].x - this.nodes[this.nodes.length - 1].x);
-    new_horizontal_distance = Math.abs(this.start_point.x - this.end_point.x);
+    current_x_distance  = Math.abs(this.nodes[0].x - this.nodes[this.nodes.length - 1].x);
+    new_x_distance      = Math.abs(this.start_point.x - this.end_point.x);
+    current_y_distance  = Math.abs(this.nodes[0].y - this.nodes[this.nodes.length - 1].y);
+    new_y_distance      = Math.abs(this.start_point.y - this.end_point.y);
     
-    scale = new_horizontal_distance / current_horizontal_distance;
+    scaleX = new_x_distance / current_x_distance;
+    scaleY = new_y_distance / current_y_distance;
 
     // First and last nodes are replaced instead of being scaled
     for(i = 1; i < this.nodes.length - 1; i++) {
-        this.nodes[i].x = this.nodes[i].x * scale;
-        this.nodes[i].y = this.nodes[i].y * scale;
+        this.nodes[i].x = this.nodes[i].x * scaleX;
+        this.nodes[i].y = this.nodes[i].y * scaleY;
     }
 };
 

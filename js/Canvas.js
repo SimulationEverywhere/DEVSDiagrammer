@@ -100,6 +100,15 @@ Canvas.prototype.initialize = function(parameters) {
 
     this.selectiveFTPStageUpdate(manifest.canvas.fps);
 
+    // responsive canvas resize.
+    var wr = window.onresize;
+    var us = this.updateScales.bind(this);
+    window.onresize = function () { 
+        if (typeof wr === "function") wr(); 
+        us();
+    };
+    window.onresize();
+
     this.stage.update();
 };
 
@@ -149,4 +158,16 @@ Canvas.prototype.selectiveFTPStageUpdate = function (fps) {
   } else {
     createjs.Ticker.setFPS(fps);
   }
+};
+
+Canvas.prototype.updateScales = function() {
+
+    this.dom_canvas.attr('width', this.dom_canvas.width());
+    this.dom_canvas.attr('height', this.dom_canvas.height());
+    this.stageWidth  = this.dom_canvas.width();
+    this.stageHeight = this.dom_canvas.height();
+
+    this.top_model.update_scale();
+
+    this.stage.update();
 };

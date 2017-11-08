@@ -121,7 +121,7 @@ Model.prototype.initialize = function(parameters) {
     }
     
     if (this.parent_dimentions !== undefined) {
-        this.rescale_box();
+        this.rescale_dimentions(this.parent_dimentions);
     }
 
     this.jsonGraphics.update_model_box({
@@ -165,9 +165,9 @@ Model.prototype.draw_coupled = function() {
 
     this.update_box(this["background-color"]);
     this.update_name();
-    this.draw_ports();
-
-    this.draw_internal_structure();
+    this.update_ports();
+    this.update_models();
+    this.update_links();
     
     this.canvas.stage.update();
 };
@@ -200,7 +200,7 @@ Model.prototype.update_name = function() {
     this.canvas.stage.update();
 };
 
-Model.prototype.draw_ports = function() {
+Model.prototype.update_ports = function() {
     
     this.clean(this.ports.in);
     this.clean(this.ports.out);
@@ -266,7 +266,7 @@ Model.prototype.clean = function(models) {
     }
 };
 
-Model.prototype.draw_internal_structure = function() {
+Model.prototype.update_models = function() {
 
     if (this.structure.type === "atomic" || this.structure.models.length === 0 ) { return; }
 
@@ -328,22 +328,19 @@ Model.prototype.draw_internal_structure = function() {
         }
     }
 
-    this.draw_links();
     this.canvas.stage.update();
 };
 
-Model.prototype.draw_links = function() {
+Model.prototype.update_links = function() {
     this.remove_links();
 
     this.draw_ic(this.structure.ic);
     this.draw_eic(this.structure.eic);
     this.draw_eoc(this.structure.eoc);
-
-    this.showing_links = true;
 };
 
 Model.prototype.draw_ic = function(ics) {
-    var nodes, to_port, from_port, link, ic, i;
+    var icGraphics, to_port, from_port, link, ic, i;
 
     for (i = 0; i < ics.length; i++) {
         ic = ics[i];
@@ -351,9 +348,10 @@ Model.prototype.draw_ic = function(ics) {
         from_port = this.getPort(ic.from_model, ic.from_port, Port.out);
         to_port = this.getPort(ic.to_model, ic.to_port, Port.in);
         
-        nodes = this.jsonGraphics.get_ic_nodes(ic);
-        link = this.connect(from_port, to_port, ic, Link.Kind.IC, nodes);
-        this.jsonGraphics.save_ic_nodes(ic, link.nodes);
+        icGraphics = this.jsonGraphics.get_ic(ic);
+        link = this.connect(from_port, to_port, ic, Link.Kind.IC, icGraphics);
+        icGraphics.nodes = link.nodes;
+        this.jsonGraphics.save_ic(icGraphics);
         this.ic.push(link);
     }
 
@@ -361,7 +359,7 @@ Model.prototype.draw_ic = function(ics) {
 };
 
 Model.prototype.draw_eic = function(eics) {
-    var to_port, from_port, link, nodes, eic, i;
+    var to_port, from_port, link, eicGraphics, eic, i;
 
     for (i = 0; i < eics.length; i++) {
         eic = eics[i];
@@ -369,9 +367,10 @@ Model.prototype.draw_eic = function(eics) {
         from_port = this.getPort(this.id, eic.from_port, Port.in);
         to_port = this.getPort(eic.to_model, eic.to_port, Port.in);
 
-        nodes = this.jsonGraphics.get_eic_nodes(eic);
-        link = this.connect(from_port, to_port, eic, Link.Kind.EIC, nodes);
-        this.jsonGraphics.save_eic_nodes(eic, link.nodes);
+        eicGraphics = this.jsonGraphics.get_eic(eic);
+        link = this.connect(from_port, to_port, eic, Link.Kind.EIC, eicGraphics);
+        eicGraphics.nodes = link.nodes;
+        this.jsonGraphics.save_eic(eicGraphics);
         this.eic.push(link);
     }
 
@@ -379,7 +378,7 @@ Model.prototype.draw_eic = function(eics) {
 };
 
 Model.prototype.draw_eoc = function(eocs) {
-    var to_port, from_port, link, nodes, eoc, i;
+    var to_port, from_port, link, eocGraphics, eoc, i;
 
     for (i = 0; i < eocs.length; i++) {
         eoc = eocs[i];
@@ -387,16 +386,17 @@ Model.prototype.draw_eoc = function(eocs) {
         from_port = this.getPort(eoc.from_model, eoc.from_port, Port.out);
         to_port = this.getPort(this.id, eoc.to_port, Port.out);
         
-        nodes = this.jsonGraphics.get_eoc_nodes(eoc);
-        link = this.connect(from_port, to_port, eoc, Link.Kind.EOC, nodes);
-        this.jsonGraphics.save_eoc_nodes(eoc, link.nodes);
+        eocGraphics = this.jsonGraphics.get_eoc(eoc);
+        link = this.connect(from_port, to_port, eoc, Link.Kind.EOC, eocGraphics);
+        eocGraphics.nodes = link.nodes;
+        this.jsonGraphics.save_eoc(eocGraphics);
         this.eoc.push(link);
     }
 
     this.canvas.stage.update();
 };
 
-Model.prototype.connect = function(from_port, to_port, information, kind, nodes, scale_nodes) {
+Model.prototype.connect = function(from_port, to_port, information, kind, linkGraphics, scale_nodes) {
     var start_point, end_point, link;
     start_point = from_port.parent.localToLocal(from_port.x + from_port.width - from_port.regX,
                                                 from_port.y - from_port.regY + from_port.height / 2,
@@ -410,8 +410,7 @@ Model.prototype.connect = function(from_port, to_port, information, kind, nodes,
     }
 
     link = new Link({
-        visible: this.showing_links,
-        last_visible: true,
+        visible: this.is_expanded && this.showing_links && linkGraphics.visible,
         canvas: this.canvas,
         kind: kind,
         information: information,
@@ -420,7 +419,7 @@ Model.prototype.connect = function(from_port, to_port, information, kind, nodes,
         to_port: to_port,
         start_point: start_point,
         end_point: end_point,
-        nodes: nodes || [start_point, end_point],
+        nodes: linkGraphics.nodes || [start_point, end_point],
         color: "#000000",
         width: 2,
     });
@@ -484,34 +483,44 @@ Model.prototype.remove_links = function() {
     this.clean(this.eoc);
     this.clean(this.ic);
 
-    this.showing_links = false;
-
     this.canvas.stage.update();
 };
 
 Model.prototype.show_submodel_links = function(submodel) {
-    var i;
-    var links = [];
+    var i, ic, eic, eoc, linkGraphics;
 
-    links = links.concat(this.ic.filter(function(link) {
+    ic = this.ic.filter(function(link) {
         return link.information.from_model === submodel.id || link.information.to_model === submodel.id;
-    }));
+    });
 
-    links = links.concat(this.eic.filter(function(link) {
+    eic = this.eic.filter(function(link) {
         return link.information.to_model === submodel.id;
-    }));
+    });
 
-    links = links.concat(this.eoc.filter(function(link) {
+    eoc = this.eoc.filter(function(link) {
         return link.information.from_model === submodel.id;
-    }));
+    });
 
-    for (i = 0; i < links.length; i++) {
-        links[i].visible = !links[i].visible;
+    for (i = 0; i < ic.length; i++) {
+        linkGraphics = this.jsonGraphics.get_ic(ic[i].information);
+        ic[i].visible = !ic[i].visible;
+        linkGraphics.visible = ic[i].visible;
+        this.jsonGraphics.save_ic(linkGraphics);
     }
 
-    //this.draw_ic(ic);
-    //this.draw_eic(eic);
-    //this.draw_eoc(eoc);
+    for (i = 0; i < eic.length; i++) {
+        linkGraphics = this.jsonGraphics.get_eic(eic[i].information);
+        eic[i].visible = !eic[i].visible;
+        linkGraphics.visible = eic[i].visible;
+        this.jsonGraphics.save_eic(linkGraphics);
+    }
+
+    for (i = 0; i < eoc.length; i++) {
+        linkGraphics = this.jsonGraphics.get_eoc(eoc[i].information);
+        eoc[i].visible = !eoc[i].visible;
+        linkGraphics.visible = eoc[i].visible;
+        this.jsonGraphics.save_eoc(linkGraphics);
+    }
 
     this.canvas.stage.update();
 };
@@ -630,27 +639,28 @@ Model.prototype.change_models_visibility = function(visible) {
     this.canvas.stage.update();
 };
 
-Model.prototype.change_links_visibility = function(visible, by_expansion) {
-    var i, last_visible;
-
-    if (by_expansion === undefined) by_expansion = false;
+Model.prototype.change_links_visibility = function(visible) {
+    var i, linkGraphics;
 
     for(i = 0; i < this.ic.length; i++) {
-        last_visible = this.ic[i].last_visible;
-        this.ic[i].last_visible = this.ic[i].visible;
-        this.ic[i].visible = visible && !(by_expansion && last_visible === false);
+        linkGraphics = this.jsonGraphics.get_ic(this.ic[i].information);
+        this.ic[i].visible = visible && linkGraphics.visible;
+        //linkGraphics.visible = this.ic[i].visible;
+        //this.jsonGraphics.save_ic(linkGraphics);
     }
 
     for(i = 0; i < this.eic.length; i++) {
-        last_visible = this.eic[i].last_visible;
-        this.eic[i].last_visible = this.eic[i].visible;
-        this.eic[i].visible = visible && !(by_expansion && last_visible === false);
+        linkGraphics = this.jsonGraphics.get_eic(this.eic[i].information);
+        this.eic[i].visible = visible && linkGraphics.visible;
+        //linkGraphics.visible = this.eic[i].visible;
+        //this.jsonGraphics.save_eic(linkGraphics);
     }
 
     for(i = 0; i < this.eoc.length; i++) {
-        last_visible = this.eoc[i].last_visible;
-        this.eoc[i].last_visible = this.eoc[i].visible;
-        this.eoc[i].visible = visible && !(by_expansion && last_visible === false);
+        linkGraphics = this.jsonGraphics.get_eoc(this.eoc[i].information);
+        this.eoc[i].visible = visible && linkGraphics.visible;
+        //linkGraphics.visible = this.eoc[i].visible;
+        //this.jsonGraphics.save_eoc(linkGraphics);
     }
     
     this.canvas.stage.update();
@@ -660,12 +670,7 @@ Model.prototype.toggle_models = function() {
 
     this.is_expanded = !this.is_expanded;
     this.change_models_visibility(this.is_expanded);
-
-    if (this.is_expanded) {
-        this.change_links_visibility(this.showing_links, true);
-    } else {
-        this.change_links_visibility(false);
-    }
+    this.change_links_visibility(this.is_expanded && this.showing_links);
 };
 
 Model.prototype.toggle_port_names = function() {
@@ -680,7 +685,7 @@ Model.prototype.toggle_port_names = function() {
 Model.prototype.toggle_links = function() {
 
     this.showing_links = !this.showing_links;
-    this.change_links_visibility(this.showing_links);
+    this.change_links_visibility(this.is_expanded && this.showing_links);
 };
 
 Model.prototype.show_port_names = function() {
@@ -722,12 +727,12 @@ Model.prototype.distance = function(a, b) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 };
 
-Model.prototype.rescale_box = function() {
+Model.prototype.rescale_dimentions = function(parent_dimentions) {
     var scaleX, scaleY;
 
     if (this.jsonGraphics.json.model_box.parent_dimentions !== undefined) {
-        scaleX = this.parent_dimentions.width / this.jsonGraphics.json.model_box.parent_dimentions.width;
-        scaleY = this.parent_dimentions.height / this.jsonGraphics.json.model_box.parent_dimentions.height;
+        scaleX = parent_dimentions.width / this.jsonGraphics.json.model_box.parent_dimentions.width;
+        scaleY = parent_dimentions.height / this.jsonGraphics.json.model_box.parent_dimentions.height;
 
         this.width = this.width * scaleX;
         this.x = this.x * scaleX;
@@ -738,6 +743,46 @@ Model.prototype.rescale_box = function() {
         this.regX = this.width / 2;
         this.regY = this.height / 2;
     }
+};
+
+Model.prototype.update_scale = function(parent_dimentions) {
+
+    if (this.is_top) {
+
+        this.x = this.canvas.stageWidth / 2;
+        this.y = this.canvas.stageHeight / 2;
+        this.width = this.canvas.stageWidth * 0.85;
+        this.height = this.canvas.stageHeight * 0.85;
+        this.regX = this.width / 2;
+        this.regY = this.height / 2;
+
+    } else {
+        this.rescale_dimentions(parent_dimentions);
+    }
+
+    this.jsonGraphics.update_model_box({
+        x: this.x, 
+        y: this.y, 
+        width: this.width,
+        height: this.height,
+        regX: this.regX,
+        regY:this.regY,
+        parent_dimentions: $.extend(true, {}, parent_dimentions) // for future rescaling reference
+    });
+
+    this.update_box(this['background-color']);
+    this.update_name();
+    this.update_ports();
+    
+    for(var i = 0; i < this.models.length; i++) {
+        this.models[i].update_scale({
+            width: this.width,
+            height: this.height
+        });
+    }
+
+    this.update_links();
+    this.canvas.stage.update();
 };
 
 /*********** Drag & Drop *****************/

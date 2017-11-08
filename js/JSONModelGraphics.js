@@ -35,7 +35,6 @@ function JSONModelGraphics(parameters) {
     this.initialize(parameters);
 }
 
-
 /**
  * Constructs a new instance of JSONModelGraphics.
  * @param {Object} parameters - All the necessary parameters to initialize the instance.
@@ -57,6 +56,8 @@ JSONModelGraphics.emptyJSONGraphics = {
     eic: []
 };
 
+JSONModelGraphics.emptyJSONLink = { visible: true };
+
 JSONModelGraphics.prototype.update_model_box = function(model_box) {
     this.json.model_box = {};
     $.extend(true, this.json.model_box, model_box);
@@ -69,7 +70,100 @@ JSONModelGraphics.prototype.update_model_position = function(x, y) {
 
     this.json.model_box.x = x;
     this.json.model_box.y = y;
-}
+};
+
+JSONModelGraphics.prototype.get_ic = function(ic) {
+    var i, new_ic;
+    
+    for(i = 0; i < this.json.ic.length; i++) {
+        if (this.same_ic(this.json.ic[i], ic)) {
+            return $.extend(true, 
+                this.clone_json(JSONModelGraphics.emptyJSONLink),
+                this.clone_json(this.json.ic[i]));
+        }
+    }
+
+    new_ic = $.extend(true, this.clone_json(JSONModelGraphics.emptyJSONLink), ic);
+    this.json.ic.push(new_ic);
+    return this.clone_json(new_ic);
+};
+
+JSONModelGraphics.prototype.get_eic = function(eic) {
+    var i, new_eic;
+
+    for(i = 0; i < this.json.eic.length; i++) {
+        if (this.same_ic(this.json.eic[i], eic)) {
+            return $.extend(true, 
+                this.clone_json(JSONModelGraphics.emptyJSONLink),
+                this.clone_json(this.json.eic[i]));
+        }
+    }
+
+    new_eic = $.extend(true, this.clone_json(JSONModelGraphics.emptyJSONLink), eic);
+    this.json.ic.push(new_eic);
+    return this.clone_json(new_eic);
+};
+
+JSONModelGraphics.prototype.get_eoc = function(eoc) {
+    var i, new_eoc;
+    
+    for(i = 0; i < this.json.eoc.length; i++) {
+        if (this.same_ic(this.json.eoc[i], eoc)) {
+            return $.extend(true, 
+                this.clone_json(JSONModelGraphics.emptyJSONLink),
+                this.clone_json(this.json.eoc[i]));
+        }
+    }
+
+    new_eoc = $.extend(true, this.clone_json(JSONModelGraphics.emptyJSONLink), eoc);
+    this.json.ic.push(new_eoc);
+    return this.clone_json(new_eoc);
+};
+
+JSONModelGraphics.prototype.save_ic = function(ic) {
+    var i, link_to_save;
+
+    link_to_save = this.clone_json(ic);
+
+    for(i = 0; i < this.json.ic.length; i++) {
+        if (this.same_ic(this.json.ic[i], ic)) {
+            this.json.ic[i] = link_to_save;
+            return;
+        }
+    }
+
+    this.json.ic.push(link_to_save);
+};
+
+JSONModelGraphics.prototype.save_eic = function(eic) {
+    var i, link_to_save;
+
+    link_to_save = this.clone_json(eic);
+
+    for(i = 0; i < this.json.eic.length; i++) {
+        if (this.same_eic(this.json.eic[i], eic)) {
+            this.json.eic[i] = link_to_save;
+            return;
+        }
+    }
+
+    this.json.eic.push(link_to_save);
+};
+
+JSONModelGraphics.prototype.save_eoc = function(eoc) {
+    var i, link_to_save;
+
+    link_to_save = this.clone_json(eoc);
+
+    for(i = 0; i < this.json.eoc.length; i++) {
+        if (this.same_eoc(this.json.eoc[i], eoc)) {
+            this.json.eoc[i] = link_to_save;
+            return;
+        }
+    }
+
+    this.json.eoc.push(link_to_save);
+};
 
 JSONModelGraphics.prototype.get_ic_nodes = function(ic) {
     var i;
