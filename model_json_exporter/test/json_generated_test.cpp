@@ -101,6 +101,8 @@ BOOST_AUTO_TEST_CASE( a_simple_model_test ){
         std::string expected_json = read_ifstream(coupled_generator_expected);
         expected_json.erase(std::remove(expected_json.begin(), expected_json.end(), '\n'), expected_json.end());
         expected_json.erase(std::remove(expected_json.begin(), expected_json.end(), ' '), expected_json.end());
+        std::cout << "Expected: " << expected_json << std::endl;
+        std::cout << "Obtained: " << obtained_json << std::endl;
         BOOST_CHECK_EQUAL(expected_json, obtained_json);
 }
 
