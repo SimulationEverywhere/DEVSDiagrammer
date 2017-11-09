@@ -35,7 +35,20 @@
 #include <cadmium/modeling/coupled_model.hpp>
 #include <cadmium/engine/pdevs_runner.hpp>
 #include "../include/model_json_exporter.hpp"
-//
+
+std::string read_ifstream(ifstream& file) {
+    std::string txt = "";
+    std::string new_line;
+    if (file.is_open()) {
+        while (file.good()) {
+            getline(file, new_line);
+            txt += "\n" + new_line;
+        }
+        file.close();
+    }
+    return txt;
+}
+
 /**
  * Checking that a known model generates the expected json output
  */
@@ -70,7 +83,7 @@ using oports = std::tuple<coupled_out_port>;
 using submodels=cadmium::modeling::models_tuple<test_generator>;
 using eics=std::tuple<>;
 using eocs=std::tuple<
-    cadmium::modeling::EOC<test_generator, out_port, coupled_out_port>
+        cadmium::modeling::EOC<test_generator, out_port, coupled_out_port>
 >;
 using ics=std::tuple<>;
 
@@ -78,29 +91,19 @@ template<typename TIME>
 using coupled_generator=cadmium::modeling::coupled_model<TIME, iports, oports, submodels, eics, eocs, ics>;
 
 BOOST_AUTO_TEST_CASE( a_simple_model_test ){
-    char testfilename[] = "ecoupled_generator_test.obtained.json";
-    //check there is not a file already with the name test.json
-    FILE *file = fopen(testfilename, "r");
-    BOOST_REQUIRE(file == NULL);
-
-    //transform the model to json
-    std::ofstream test_output(testfilename);
+    std::ostringstream test_output;
     export_model_to_json<float, coupled_generator>(test_output);
-    
-    //check the file was created and is not empty
-    ifstream ifs(testfilename);
-    BOOST_REQUIRE(ifs.good());
 
-    std::string line;
-    std::getline(ifs, line);
-    BOOST_CHECK(line.length() > 0); //something was written
-    
-    //TODO: validate the actual expected output is there
-    
-    ifs.close();
-    //remove the created file
-    BOOST_REQUIRE(remove( testfilename ) == 0 );
+        std::string obtained_json = test_output.str();
+        obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), '\n'), obtained_json.end());
+        obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), ' '), obtained_json.end());
+        std::ifstream coupled_generator_expected("../test/test_files/coupled_generator.expected.json");
+        std::string expected_json = read_ifstream(coupled_generator_expected);
+        expected_json.erase(std::remove(expected_json.begin(), expected_json.end(), '\n'), expected_json.end());
+        expected_json.erase(std::remove(expected_json.begin(), expected_json.end(), ' '), expected_json.end());
+        BOOST_CHECK_EQUAL(expected_json, obtained_json);
 }
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
