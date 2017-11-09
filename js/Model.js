@@ -396,32 +396,20 @@ Model.prototype.draw_eoc = function(eocs) {
     this.canvas.stage.update();
 };
 
-Model.prototype.connect = function(from_port, to_port, information, kind, linkGraphics, scale_nodes) {
-    var start_point, end_point, link;
-    start_point = from_port.parent.localToLocal(from_port.x + from_port.width - from_port.regX,
-                                                from_port.y - from_port.regY + from_port.height / 2,
-                                                this);
-    end_point = to_port.parent.localToLocal(to_port.x - to_port.regX,
-                                            to_port.y - to_port.regY + to_port.height / 2,
-                                            this);
-    
-    if (scale_nodes === undefined) {
-        scale_nodes = true;
-    }
+Model.prototype.connect = function(from_port, to_port, information, kind, linkGraphics) {
+    var link;
 
     link = new Link({
-        visible: this.is_expanded && this.showing_links && linkGraphics.visible,
-        canvas: this.canvas,
+        visible: this.is_expanded && this.showing_links,
         kind: kind,
         information: information,
-        scale_nodes: scale_nodes,
         from_port: from_port,
         to_port: to_port,
-        start_point: start_point,
-        end_point: end_point,
-        nodes: linkGraphics.nodes || [start_point, end_point],
-        color: "#000000",
+        nodes: linkGraphics.nodes || [],
+        color: manifest.link.color,
         width: 2,
+        canvas: this.canvas,
+        parent: this,
     });
 
     this.addChild(link);
@@ -487,7 +475,7 @@ Model.prototype.remove_links = function() {
 };
 
 Model.prototype.show_submodel_links = function(submodel) {
-    var i, ic, eic, eoc, linkGraphics;
+    var i, ic, eic, eoc;
 
     ic = this.ic.filter(function(link) {
         return link.information.from_model === submodel.id || link.information.to_model === submodel.id;
@@ -502,31 +490,22 @@ Model.prototype.show_submodel_links = function(submodel) {
     });
 
     for (i = 0; i < ic.length; i++) {
-        linkGraphics = this.jsonGraphics.get_ic(ic[i].information);
         ic[i].visible = !ic[i].visible;
-        linkGraphics.visible = ic[i].visible;
-        this.jsonGraphics.save_ic(linkGraphics);
     }
 
     for (i = 0; i < eic.length; i++) {
-        linkGraphics = this.jsonGraphics.get_eic(eic[i].information);
         eic[i].visible = !eic[i].visible;
-        linkGraphics.visible = eic[i].visible;
-        this.jsonGraphics.save_eic(linkGraphics);
     }
 
     for (i = 0; i < eoc.length; i++) {
-        linkGraphics = this.jsonGraphics.get_eoc(eoc[i].information);
         eoc[i].visible = !eoc[i].visible;
-        linkGraphics.visible = eoc[i].visible;
-        this.jsonGraphics.save_eoc(linkGraphics);
     }
 
     this.canvas.stage.update();
 };
 
 Model.prototype.update_submodel_link = function(submodel) {
-    var i, from_port, to_port, submodel_ports_in, submodel_ports_out, information, nodes, link, visible;
+    var i, submodel_ports_in, submodel_ports_out;
 
     submodel_ports_in = submodel.ports.in.map(function(p) { return p.id; });
     submodel_ports_out = submodel.ports.out.map(function(p) { return p.id; });
@@ -534,55 +513,19 @@ Model.prototype.update_submodel_link = function(submodel) {
 
     for (i = 0; i < this.eic.length; i++) {
         if (submodel_ports_in.indexOf(this.eic[i].to_port)) {
-            from_port = this.eic[i].from_port;
-            to_port = this.eic[i].to_port;
-            information = this.eic[i].information;
-            nodes = this.eic[i].nodes;
-            visible = this.eic[i].visible;
-
-            this.removeChild(this.eic[i]);
-            this.eic.splice(i, 1);
-            
-            link = this.connect(from_port, to_port, information, Link.Kind.EIC, nodes, false);
-            link.visible = visible;
-            this.jsonGraphics.save_eic_nodes(information, link.nodes);
-            this.eic.push(link);
+            this.eic[i].update_end_points();
         }
     }
 
     for (i = 0; i < this.eoc.length; i++) {
-        if (submodel_ports_out.indexOf(this.eoc[i].from_port)) {
-            from_port = this.eoc[i].from_port;
-            to_port = this.eoc[i].to_port;
-            information = this.eoc[i].information;
-            nodes = this.eoc[i].nodes;
-            visible = this.eoc[i].visible;
-            
-            this.removeChild(this.eoc[i]);
-            this.eoc.splice(i, 1);
-            
-            link = this.connect(from_port, to_port, information, Link.Kind.EOC, nodes, false);
-            link.visible = visible;
-            this.jsonGraphics.save_eoc_nodes(information, link.nodes);
-            this.eoc.push(link);
+        if (submodel_ports_out.indexOf(this.eoc[i].from_port)) {    
+            this.eoc[i].update_end_points();
         }
     }
 
     for (i = 0; i < this.ic.length; i++) {
         if (submodel_ports_in.indexOf(this.ic[i].to_port) || submodel_ports_out.indexOf(this.ic[i].from_port)) {
-            from_port = this.ic[i].from_port;
-            to_port = this.ic[i].to_port;
-            information = this.ic[i].information;
-            nodes = this.ic[i].nodes;
-            visible = this.ic[i].visible;
-            
-            this.removeChild(this.ic[i]);
-            this.ic.splice(i, 1);
-            
-            link = this.connect(from_port, to_port, information, Link.Kind.IC, nodes, false);
-            link.visible = visible;
-            this.jsonGraphics.save_ic_nodes(information, link.nodes);
-            this.ic.push(link);
+            this.ic[i].update_end_points();
         }
     }
 
@@ -644,23 +587,17 @@ Model.prototype.change_links_visibility = function(visible) {
 
     for(i = 0; i < this.ic.length; i++) {
         linkGraphics = this.jsonGraphics.get_ic(this.ic[i].information);
-        this.ic[i].visible = visible && linkGraphics.visible;
-        //linkGraphics.visible = this.ic[i].visible;
-        //this.jsonGraphics.save_ic(linkGraphics);
+        this.ic[i].visible = visible;
     }
 
     for(i = 0; i < this.eic.length; i++) {
         linkGraphics = this.jsonGraphics.get_eic(this.eic[i].information);
-        this.eic[i].visible = visible && linkGraphics.visible;
-        //linkGraphics.visible = this.eic[i].visible;
-        //this.jsonGraphics.save_eic(linkGraphics);
+        this.eic[i].visible = visible;
     }
 
     for(i = 0; i < this.eoc.length; i++) {
         linkGraphics = this.jsonGraphics.get_eoc(this.eoc[i].information);
-        this.eoc[i].visible = visible && linkGraphics.visible;
-        //linkGraphics.visible = this.eoc[i].visible;
-        //this.jsonGraphics.save_eoc(linkGraphics);
+        this.eoc[i].visible = visible;
     }
     
     this.canvas.stage.update();
@@ -669,6 +606,7 @@ Model.prototype.change_links_visibility = function(visible) {
 Model.prototype.toggle_models = function() {
 
     this.is_expanded = !this.is_expanded;
+    this.showing_links = true;
     this.change_models_visibility(this.is_expanded);
     this.change_links_visibility(this.is_expanded && this.showing_links);
 };

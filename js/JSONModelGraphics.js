@@ -56,7 +56,10 @@ JSONModelGraphics.emptyJSONGraphics = {
     eic: []
 };
 
-JSONModelGraphics.emptyJSONLink = { visible: true };
+JSONModelGraphics.emptyJSONLink = {
+    nodes: [],
+    information: {}
+};
 
 JSONModelGraphics.prototype.update_model_box = function(model_box) {
     this.json.model_box = {};

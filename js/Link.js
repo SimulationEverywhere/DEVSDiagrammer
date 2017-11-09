@@ -55,26 +55,20 @@ Link.Kind = { IC: "IC", EIC: "EIC", EOC: "EOC" };
 /**
  * Construct a new Link instance
  * @param  {Object} parameters - all the required parameters to construct a new instance.
- * @param {Object} parameters.start_point - the current start point where the link starts.
- * @param {Object} parameters.end_point - the current end point where the link ends.
+ * @param {Port} paramters.to_port - The port connected to the link end.
+ * @param {Port} paramters.from_port - The port connected to the link start.
  * @param {[Object]} parameters.nodes - the sorted list of nodes, a node is an object with attributes x and y.
  * @param {Canvas} parameters.canvas - The canvas where the link belongs to update the stage.
+ * @param {Model} parameters.parent - The parent model where the link belongs.
  * @param {String} parameters.color - The link colo in RGB format.
  * @param {Number} parameters.width - The link width in pixels.
- * @param {Boolean} parameters.scale_nodes - Indicates to the constructor that the node positions comes from a different scale and must be scaled.
  */
 Link.prototype.initialize = function(parameters) {
     
     this.ShapeInitialize();
     $.extend(true, this, parameters);
 
-    if (parameters.scale_nodes) {
-        this.scale_node_positions();
-    }
-
-    // Replace first and last nodes
-    this.nodes.splice(0, 1, this.start_point);
-    this.nodes.splice(this.nodes.length - 1, 1, this.end_point);
+    this.scale_node_positions();
 
     this.holded = false;
     this.node_epsilon = manifest.link.node_epsilon;
@@ -157,21 +151,56 @@ Link.prototype.get_new_node_index = function(node) {
 };
 
 Link.prototype.scale_node_positions = function() {
-    var new_x_distance, current_x_distance, new_y_distance, current_y_distance, scaleX, scaleY, i;
+    var start_point, end_point, new_x_distance, current_x_distance;
+    var new_y_distance, current_y_distance, scaleX, scaleY, i;
+    var from_port, to_port;
+
+    from_port = this.from_port;
+    to_port = this.to_port;
+
+    start_point = from_port.parent.localToLocal(from_port.x + from_port.width - from_port.regX,
+                                                from_port.y - from_port.regY + from_port.height / 2,
+                                                this.parent);
+    end_point = to_port.parent.localToLocal(to_port.x - to_port.regX,
+                                            to_port.y - to_port.regY + to_port.height / 2,
+                                            this.parent);
 
     current_x_distance  = Math.abs(this.nodes[0].x - this.nodes[this.nodes.length - 1].x);
-    new_x_distance      = Math.abs(this.start_point.x - this.end_point.x);
+    new_x_distance      = Math.abs(start_point.x - end_point.x);
     current_y_distance  = Math.abs(this.nodes[0].y - this.nodes[this.nodes.length - 1].y);
-    new_y_distance      = Math.abs(this.start_point.y - this.end_point.y);
+    new_y_distance      = Math.abs(start_point.y - end_point.y);
     
     scaleX = new_x_distance / current_x_distance;
     scaleY = new_y_distance / current_y_distance;
 
-    // First and last nodes are replaced instead of being scaled
     for(i = 1; i < this.nodes.length - 1; i++) {
         this.nodes[i].x = this.nodes[i].x * scaleX;
         this.nodes[i].y = this.nodes[i].y * scaleY;
     }
+    
+    // replace first and last nodes
+    this.nodes.splice(0, 1, start_point);
+    this.nodes.splice(Math.max(1, this.nodes.length - 1), 1, end_point);
+};
+
+
+Link.prototype.update_end_points = function() {
+    var start_point, end_point, from_port, to_port;
+
+    from_port = this.from_port;
+    to_port = this.to_port;
+
+    start_point = from_port.parent.localToLocal(from_port.x + from_port.width - from_port.regX,
+                                                from_port.y - from_port.regY + from_port.height / 2,
+                                                this.parent);
+    end_point = to_port.parent.localToLocal(to_port.x - to_port.regX,
+                                            to_port.y - to_port.regY + to_port.height / 2,
+                                            this.parent);
+    // replace first and last nodes
+    this.nodes.splice(0, 1, start_point);
+    this.nodes.splice(Math.max(1, this.nodes.length - 1), 1, end_point);
+    
+    this.update();
 };
 
 /********* Drag & drop ******************/
