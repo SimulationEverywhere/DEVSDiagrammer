@@ -101,15 +101,22 @@ function export_model_json_selected() {
 }
 
 function export_model_image_selected(imgType) {
-	var model;
+    var export_img;
+	var models_to_export = [];
+    var delay = 1000 / manifest.canvas.fps + manifest.canvas.fps;
 
-	while (selected_models.length > 0) {
-		model = selected_models[0];
+	while (selected_models.length > 0) {	
+        if (selected_models[0].is_top) {
+            models_to_export.push(selected_models[0]);
+        }
 		selected_models[0].toggle_selection(evt);
-		if (model.is_top) {
-			export_model_image(model, imgType);
-		}
 	}
+
+    for (var i = 0; i < models_to_export.length; i++) {
+        models_to_export[i].canvas.stage.update();
+        export_img = export_model_image.bind(export_model_image, models_to_export[i], imgType);
+        setTimeout(export_img, delay);
+    }
 }
 
 function toggle_models_selected() {
