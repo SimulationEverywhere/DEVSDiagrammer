@@ -165,17 +165,22 @@ Link.prototype.scale_node_positions = function() {
                                             to_port.y - to_port.regY + to_port.height / 2,
                                             this.parent);
 
-    current_x_distance  = Math.abs(this.nodes[0].x - this.nodes[this.nodes.length - 1].x);
-    new_x_distance      = Math.abs(start_point.x - end_point.x);
-    current_y_distance  = Math.abs(this.nodes[0].y - this.nodes[this.nodes.length - 1].y);
-    new_y_distance      = Math.abs(start_point.y - end_point.y);
-    
-    scaleX = new_x_distance / current_x_distance;
-    scaleY = new_y_distance / current_y_distance;
+    if (this.nodes.length > 2) {
 
-    for(i = 1; i < this.nodes.length - 1; i++) {
-        this.nodes[i].x = this.nodes[i].x * scaleX;
-        this.nodes[i].y = this.nodes[i].y * scaleY;
+        // If there is more nodes that just the end point, they must be scaled according to the new end points.
+
+        current_x_distance  = Math.abs(this.nodes[0].x - this.nodes[this.nodes.length - 1].x);
+        new_x_distance      = Math.abs(start_point.x - end_point.x);
+        current_y_distance  = Math.abs(this.nodes[0].y - this.nodes[this.nodes.length - 1].y);
+        new_y_distance      = Math.abs(start_point.y - end_point.y);
+        
+        scaleX = new_x_distance / current_x_distance;
+        scaleY = new_y_distance / current_y_distance;
+
+        for(i = 1; i < this.nodes.length - 1; i++) {
+            this.nodes[i].x = this.nodes[i].x * scaleX;
+            this.nodes[i].y = this.nodes[i].y * scaleY;
+        }
     }
     
     // replace first and last nodes
