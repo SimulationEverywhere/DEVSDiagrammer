@@ -90,12 +90,16 @@ template<typename TIME>
 using coupled_generator=cadmium::modeling::coupled_model<TIME, iports, oports, submodels, eics, eocs, ics>;
 
 BOOST_AUTO_TEST_CASE( a_simple_model_test ){
+    std::cout << "entra" << std::endl;
     std::ostringstream test_output;
     export_model_to_json<float, coupled_generator>(test_output);
-
+        std::cout << "entra" << std::endl;
     std::string obtained_json = test_output.str();
+        std::cout << "entra" << std::endl;
     obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), '\n'), obtained_json.end());
+        std::cout << "entra" << std::endl;
     obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), ' '), obtained_json.end());
+        std::cout << "entra" << std::endl;
     std::string expected_json = "{\"id\":\"cadmium::modeling::coupled_model<float,std::tuple<>,std::tuple<json_translation_test_suite::coupled_out_port>,cadmium::modeling::models_tuple<json_translation_test_suite::test_generator>,std::tuple<>,std::tuple<cadmium::modeling::EOC<json_translation_test_suite::test_generator,cadmium::basic_models::generator_defs<json_translation_test_suite::test_tick>::out,json_translation_test_suite::coupled_out_port>>,std::tuple<>>\",\"type\":\"coupled\",\"eoc\":[{\"to_port\":\"json_translation_test_suite::coupled_out_port\",\"from_model\":\"json_translation_test_suite::test_generator<float>\",\"from_port\":\"cadmium::basic_models::generator_defs<json_translation_test_suite::test_tick>::out\"}],\"ports\":{\"out\":[{\"name\":\"json_translation_test_suite::coupled_out_port\",\"message_type\":\"json_translation_test_suite::test_tick\",\"port_kind\":\"out\"}]},\"models\":[{\"id\":\"json_translation_test_suite::test_generator<float>\",\"type\":\"atomic\",\"ports\":{\"out\":[{\"name\":\"cadmium::basic_models::generator_defs<json_translation_test_suite::test_tick>::out\",\"message_type\":\"json_translation_test_suite::test_tick\",\"port_kind\":\"out\"}]}}]}";
     std::cout << "Expected: " << expected_json << std::endl;
     std::cout << "Obtained: " << obtained_json << std::endl;
