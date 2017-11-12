@@ -110,8 +110,8 @@ BOOST_AUTO_TEST_CASE( an_atomic_model ){
     std::string obtained_json = test_output.str();
     obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), '\n'), obtained_json.end());
     obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), ' '), obtained_json.end());
-    std::string expected_json = "{\"id\":\"json_translation_test_suite::test_generator<float>\",\"type\":\"atomic\",\"ports\":{\"out\":[{\"name\":\"cadmium::basic_models::generator_defs<json_translation_test_suite::test_tick>::out\",\"message_type\":\"json_translation_test_suite::test_tick\",\"port_kind\":\"out\"}]}}";
-    BOOST_CHECK_EQUAL(1, 1);
+    std::string expected_json = "{\"id\":\"test_generator<float>\",\"type\":\"atomic\",\"ports\":{\"out\":[{\"name\":\"cadmium::basic_models::generator_defs<test_tick>::out\",\"message_type\":\"test_tick\",\"port_kind\":\"out\"}]}}";
+    BOOST_CHECK_EQUAL(obtained_json, expected_json);
 }
 
 
