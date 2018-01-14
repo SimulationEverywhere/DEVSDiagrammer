@@ -36,6 +36,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <cadmium/modeling/message_bag.hpp>
 #include <cadmium/modeling/ports.hpp>
+#include <cadmium/concept/atomic_model_assert.hpp>
 
 using boost::property_tree::ptree;
 using cadmium::make_message_bags;
