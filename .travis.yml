@@ -17,6 +17,9 @@ matrix:
       env: CC=gcc-7 CXX=g++-7 BOOST_ROOT=/usr/include/boost 
       compiler: gcc
       before_install:
+          - sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+          - sudo apt-get update
+          - sudo apt-get install g++-7
           - sudo apt-get install libboost-dev
 
 script:
