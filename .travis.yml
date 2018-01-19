@@ -23,4 +23,8 @@ matrix:
           - sudo apt-get install libboost-dev
 
 script:
-  - git submodule update -i --recursive --remote && cd model_json_exporter && cmake -G "Unix Makefiles" . && make && make test
+  - git submodule update -i --recursive --remote
+  - cd model_json_exporter
+  - cmake -G "Unix Makefiles" .
+  - make
+  - make test
