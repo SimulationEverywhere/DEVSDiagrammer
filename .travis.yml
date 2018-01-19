@@ -20,7 +20,7 @@ matrix:
           - sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
           - sudo apt-get update
           - sudo apt-get install g++-7
-          - sudo apt-get install libboost-dev
+          - sudo apt-get install libboost-test-dev
 
 script:
   - git submodule update -i --recursive --remote
