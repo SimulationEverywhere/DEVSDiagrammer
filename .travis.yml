@@ -17,15 +17,7 @@ matrix:
       env: CC=gcc-7 CXX=g++-7 BOOST_ROOT=/usr/include/boost 
       compiler: gcc
       before_install:
-          - sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
-          - sudo apt-get update
-          - sudo apt-get install g++-7
-          - export BOOST_URL="https://downloads.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz"
-          - mkdir -p /tmp/boost
-          - wget --quiet -O - ${BOOST_URL} | tar --strip-components=1 -xz -C /tmp/boost  || exit 1
-          - cd /tmp/boost/tools/build && ./bootstrap.sh && ./b2 install --prefix=/tmp/b2
-          - export PATH=/tmp/b2/bin:${PATH}
-          - cd /tmp/boost && b2 toolset=gcc cxxflags="-std=c++14 ${CXXFLAGS}"
+          - sudo apt-get install libboost-dev
 
 script:
   - git submodule update -i --recursive --remote && cd model_json_exporter && cmake -G "Unix Makefiles" . && make && make test
