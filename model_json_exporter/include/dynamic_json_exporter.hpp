@@ -35,9 +35,11 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/core/demangle.hpp>
 
 #include <cadmium/modeling/dynamic_atomic.hpp>
 #include <cadmium/modeling/dynamic_coupled.hpp>
+#include <cadmium/modeling/ports.hpp>
 
 using boost::property_tree::ptree;
 using boost::property_tree::write_json;
@@ -54,8 +56,12 @@ class dynamic_atomic_cadmium_to_json {
         ptree current_json_port;
 
         for (auto& port : ports) {
+
+            std::string port_type = boost::core::demangle(port.name());
+            port_type = port_type.substr(port_type.find_last_of(':')+1);
+
             current_json_port.clear();
-            current_json_port.put("name", boost::typeindex::type_id<decltype(port)>().pretty_name());
+            current_json_port.put("name", port_type);
             current_json_port.put("message_type", "--"); // TODO(Lao): check how to get the message type if possible
 
             if (out_in == cadmium::port_kind::out) {
@@ -110,12 +116,19 @@ class dynamic_coupled_cadmium_to_json {
         ptree json_IC_list;
         ptree current_json_ic;
 
+
         for (auto& ic : ics) {
+            std::string from_port_type = boost::core::demangle(ic._link->from_port_type_index().name());
+            from_port_type = from_port_type.substr(from_port_type.find_last_of(':')+1);
+
+            std::string to_port_type = boost::core::demangle(ic._link->to_port_type_index().name());
+            to_port_type = to_port_type.substr(to_port_type.find_last_of(':')+1);
+
             current_json_ic.clear();
             current_json_ic.put("from_model", ic._from);
-            current_json_ic.put("from_port", boost::typeindex::type_id<decltype(ic._link->from_port_type_index())>().pretty_name());
+            current_json_ic.put("from_port", from_port_type);
             current_json_ic.put("to_model", ic._to);
-            current_json_ic.put("to_port", boost::typeindex::type_id<decltype(ic._link->from_port_type_index())>().pretty_name());
+            current_json_ic.put("to_port", to_port_type);
             json_IC_list.push_back(std::make_pair("", current_json_ic));
         }
 
@@ -129,10 +142,17 @@ class dynamic_coupled_cadmium_to_json {
         ptree current_json_ic;
 
         for (auto& eic : eics) {
+
+            std::string from_port_type = boost::core::demangle(eic._link->from_port_type_index().name());
+            from_port_type = from_port_type.substr(from_port_type.find_last_of(':')+1);
+
+            std::string to_port_type = boost::core::demangle(eic._link->to_port_type_index().name());
+            to_port_type = to_port_type.substr(to_port_type.find_last_of(':')+1);
+
             current_json_ic.clear();
-            current_json_ic.put("from_port", boost::typeindex::type_id<decltype(eic._link->from_port_type_index())>().pretty_name());
+            current_json_ic.put("from_port", from_port_type);
             current_json_ic.put("to_model", eic._to);
-            current_json_ic.put("to_port", boost::typeindex::type_id<decltype(eic._link->from_port_type_index())>().pretty_name());
+            current_json_ic.put("to_port", to_port_type);
             json_EIC_list.push_back(std::make_pair("", current_json_ic));
         }
 
@@ -146,10 +166,17 @@ class dynamic_coupled_cadmium_to_json {
         ptree current_json_ic;
 
         for (auto& eoc : eocs) {
+
+            std::string from_port_type = boost::core::demangle(eoc._link->from_port_type_index().name());
+            from_port_type = from_port_type.substr(from_port_type.find_last_of(':')+1);
+
+            std::string to_port_type = boost::core::demangle(eoc._link->to_port_type_index().name());
+            to_port_type = to_port_type.substr(to_port_type.find_last_of(':')+1);
+
             current_json_ic.clear();
             current_json_ic.put("from_model", eoc._from);
-            current_json_ic.put("from_port", boost::typeindex::type_id<decltype(eoc._link->from_port_type_index())>().pretty_name());
-            current_json_ic.put("to_port", boost::typeindex::type_id<decltype(eoc._link->from_port_type_index())>().pretty_name());
+            current_json_ic.put("from_port", from_port_type);
+            current_json_ic.put("to_port", to_port_type);
             json_EOC_list.push_back(std::make_pair("", current_json_ic));
         }
 
@@ -167,7 +194,11 @@ class dynamic_coupled_cadmium_to_json {
         ptree current_json_port;
 
         for (auto& port : ports) {
-            current_json_port.put("name", boost::typeindex::type_id<decltype(port)>().pretty_name());
+
+            std::string port_type = boost::core::demangle(port.name());
+            port_type = port_type.substr(port_type.find_last_of(':')+1);
+
+            current_json_port.put("name", port_type);
             current_json_port.put("message_type", "--"); // TODO(Lao): check how to get the message type if possible
 
             if (out_in == cadmium::port_kind::out) {
