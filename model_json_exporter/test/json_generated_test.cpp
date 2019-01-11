@@ -33,7 +33,9 @@
 #include <cadmium/basic_model/accumulator.hpp>
 #include <cadmium/modeling/coupled_model.hpp>
 #include <cadmium/engine/pdevs_runner.hpp>
+#include <cadmium/modeling/dynamic_model_translator.hpp>
 #include "../include/model_json_exporter.hpp"
+#include "../include/dynamic_json_exporter.hpp"
 
 std::string read_ifstream(ifstream& file) {
     std::string txt;
@@ -114,3 +116,20 @@ BOOST_AUTO_TEST_CASE( an_atomic_model ){
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE( dynamic_cadmium_json_translation_test_suite )
+
+BOOST_AUTO_TEST_CASE( dynamic_cadmium_a_simple_model_test ) {
+    std::ostringstream test_output;
+    shared_ptr<cadmium::dynamic::modeling::coupled<float>> model = cadmium::dynamic::translate::make_dynamic_coupled_model<float, coupled_generator>();
+    dynamic_export_model_to_json<float>(test_output, model);
+
+    std::string obtained_json = test_output.str();
+    obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), '\n'), obtained_json.end());
+    obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), ' '), obtained_json.end());
+
+    std::cout << obtained_json << std::endl;
+    std::string expected_json = "{\"id\":\"cadmium::modeling::coupled_model<float,std::tuple<>,std::tuple<coupled_out_port>,cadmium::modeling::models_tuple<test_generator>,std::tuple<>,std::tuple<cadmium::modeling::EOC<test_generator,cadmium::basic_models::generator_defs<test_tick>::out,coupled_out_port>>,std::tuple<>>\",\"type\":\"coupled\",\"eoc\":[{\"to_port\":\"coupled_out_port\",\"from_model\":\"test_generator<float>\",\"from_port\":\"cadmium::basic_models::generator_defs<test_tick>::out\"}],\"ports\":{\"out\":[{\"name\":\"coupled_out_port\",\"message_type\":\"--\",\"port_kind\":\"out\"}]},\"models\":[{\"id\":\"test_generator<float>\",\"type\":\"atomic\",\"ports\":{\"out\":[{\"name\":\"cadmium::basic_models::generator_defs<test_tick>::out\",\"message_type\":\"--\",\"port_kind\":\"out\"}]}}]}";
+    BOOST_CHECK_EQUAL(expected_json, obtained_json);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

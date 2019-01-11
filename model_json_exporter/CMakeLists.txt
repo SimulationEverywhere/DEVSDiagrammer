@@ -6,7 +6,7 @@ set (DEVSDiagrammer_VERSION_MINOR 0)
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
-include_directories(include ${Boost_INCLUDE_DIRS} cadmium/include )
+include_directories(include ${Boost_INCLUDE_DIRS} ../../cadmium/include )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++17")
 
