@@ -26,6 +26,7 @@
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string.hpp>
 #include <cadmium/logger/tuple_to_ostream.hpp>
 #include <cadmium/basic_model/int_generator_one_sec.hpp>
 #include <cadmium/basic_model/reset_generator_five_sec.hpp>
@@ -98,6 +99,8 @@ BOOST_AUTO_TEST_CASE( a_simple_model_test ){
     std::string obtained_json = test_output.str();
     obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), '\n'), obtained_json.end());
     obtained_json.erase(std::remove(obtained_json.begin(), obtained_json.end(), ' '), obtained_json.end());
+    boost::replace_all(obtained_json, "::__1", "");
+    
     std::string expected_json = "{\"id\":\"cadmium::modeling::coupled_model<float,std::tuple<>,std::tuple<coupled_out_port>,cadmium::modeling::models_tuple<test_generator>,std::tuple<>,std::tuple<cadmium::modeling::EOC<test_generator,cadmium::basic_models::generator_defs<test_tick>::out,coupled_out_port>>,std::tuple<>>\",\"type\":\"coupled\",\"eoc\":[{\"to_port\":\"coupled_out_port\",\"from_model\":\"test_generator<float>\",\"from_port\":\"cadmium::basic_models::generator_defs<test_tick>::out\"}],\"ports\":{\"out\":[{\"name\":\"coupled_out_port\",\"message_type\":\"test_tick\",\"port_kind\":\"out\"}]},\"models\":[{\"id\":\"test_generator<float>\",\"type\":\"atomic\",\"ports\":{\"out\":[{\"name\":\"cadmium::basic_models::generator_defs<test_tick>::out\",\"message_type\":\"test_tick\",\"port_kind\":\"out\"}]}}]}";
     BOOST_CHECK_EQUAL(expected_json, obtained_json);
 }
