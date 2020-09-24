@@ -1,3 +1,0 @@
-[submodule "model_json_exporter/cadmium"]
-	path = model_json_exporter/cadmium
-	url = https://github.com/SimulationEverywhere/cadmium.git
